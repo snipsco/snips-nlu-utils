@@ -1,6 +1,5 @@
 use std::ops::Range;
 
-
 pub fn convert_to_char_range(string: &str, range: &Range<usize>) -> Range<usize> {
     Range {
         start: convert_to_char_index(string, range.start),
