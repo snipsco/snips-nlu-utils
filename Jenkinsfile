@@ -1,7 +1,8 @@
 def branchName = "${env.BRANCH_NAME}"
 
 def version(path) {
-    readFile("${path}/__version__").split("\n")[0]
+    def versionLine = readFile("${path}/Cargo.toml").split("\n")[2]
+    versionLine.substring(11, versionLine.length()-1)
 }
 
 node('jenkins-slave-ec2') {
