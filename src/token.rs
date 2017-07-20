@@ -6,7 +6,7 @@ use regex::{Regex, RegexBuilder};
 use string::convert_to_char_range;
 use range::ranges_overlap;
 
-type Ngrams = (String, Vec<usize>);
+pub type Ngrams = (String, Vec<usize>);
 
 const CURRENCIES: &str = "$؋ƒ៛¥₡₱£€¢﷼₪₩₭₨₮₦₽฿₴₫";
 
