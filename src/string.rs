@@ -1,4 +1,5 @@
 use std::ops::Range;
+use unicode_normalization::char::{decompose_canonical, compose, is_combining_mark};
 
 pub fn convert_to_char_range(string: &str, range: &Range<usize>) -> Range<usize> {
     Range {
@@ -58,6 +59,50 @@ pub fn suffix_from_char_index(string: String, index: usize) -> String {
     substring_with_char_range(string, &(index..length))
 }
 
+/// Apply the following normalization successively:
+///     1) trim
+///     2) remove diacritics
+///     3) lowercase
+///
+/// # Examples
+///
+/// ```
+/// use nlu_utils::string::normalize;
+/// 
+/// assert_eq!("heloa".to_string(), normalize("  HelöÀ "));
+/// ```
+pub fn normalize(string: &str) -> String {
+    remove_diacritics(string.trim()).to_lowercase()
+}
+
+/// Remove common accentuations and diacritics
+///
+/// More specifically, remove all combination marks (https://en.wikipedia.org/wiki/Combining_character)
+///
+/// # Examples
+///
+/// ```
+/// use nlu_utils::string::remove_diacritics;
+///
+/// assert_eq!("ceaA".to_owned(), remove_diacritics("çéaÀ"));
+/// ```
+pub fn remove_diacritics(string: &str) -> String {
+    string.chars().flat_map(|c| remove_combination_marks(c)).collect()
+}
+
+fn remove_combination_marks(character: char) -> Option<char> {
+    let mut decomposition = Vec::<char>::new();
+    decompose_canonical(character, |c| {
+        if !is_combining_mark(c) {
+            decomposition.push(c)
+        }
+    });
+    let first_char = decomposition.first().map(|c| c.to_owned());
+    decomposition.into_iter().skip(1).fold(first_char, |opt_acc, c| {
+        opt_acc.map(|acc| compose(acc, c)).unwrap_or(None)
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -97,5 +142,23 @@ mod tests {
 
         // Then
         assert_eq!("ö !!", &suffix);
+    }
+
+    #[test]
+    fn remove_combination_marks_works() {
+        assert_eq!(Some('c'.to_owned()), remove_combination_marks('ç'));
+        assert_eq!(Some('e'.to_owned()), remove_combination_marks('ë'));
+        assert_eq!(Some('안'.to_owned()), remove_combination_marks('안'));
+    }
+
+    #[test]
+    fn remove_diacritics_works() {
+        assert_eq!("".to_owned(), remove_diacritics(""));
+        assert_eq!("ceaA".to_owned(), remove_diacritics("çéaÀ"));
+    }
+
+    #[test]
+    fn normalize_works() {
+        assert_eq!("heloa".to_string(), normalize("  HelöÀ "));
     }
 }
