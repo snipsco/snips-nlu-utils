@@ -60,6 +60,7 @@ pub fn suffix_from_char_index(string: String, index: usize) -> String {
 }
 
 /// Apply the following normalization successively:
+///
 ///     1) trim
 ///     2) remove diacritics
 ///     3) lowercase
