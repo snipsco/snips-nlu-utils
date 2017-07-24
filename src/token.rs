@@ -19,6 +19,10 @@ pub struct Token {
 }
 
 impl Token {
+    pub fn new(value: String, range: Range<usize>, char_range: Range<usize>) -> Self {
+        Token {value, range, char_range, _normalized: None}
+    }
+
     pub fn normalized_value(&mut self) -> String {
         if let Some(ref normalized) = self._normalized {
             normalized.to_string()
