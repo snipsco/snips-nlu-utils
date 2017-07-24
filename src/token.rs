@@ -3,7 +3,7 @@ use std::ops::Range;
 use itertools::Itertools;
 
 use regex::{Regex, RegexBuilder};
-use string::convert_to_char_range;
+use string::{convert_to_char_range, normalize};
 use range::ranges_overlap;
 
 pub type Ngrams = (String, Vec<usize>);
@@ -15,6 +15,18 @@ pub struct Token {
     pub value: String,
     pub range: Range<usize>,
     pub char_range: Range<usize>,
+    _normalized: Option<String>,
+}
+
+impl Token {
+    pub fn normalized_value(&mut self) -> String {
+        if let Some(ref normalized) = self._normalized {
+            normalized.to_string()
+        } else {
+            self._normalized = Some(normalize(&self.value));
+            self._normalized.clone().unwrap()
+        }
+    }
 }
 
 pub fn tokenize(input: &str) -> Vec<Token> {
@@ -42,6 +54,7 @@ fn _tokenize(input: &str, regexes: &[&Regex]) -> Vec<Token> {
                     char_range: convert_to_char_range(input, &range),
                     value,
                     range,
+                    _normalized: None
                 }
             })
             .filter(|t| non_overlapping_tokens.iter().find(|t2| ranges_overlap(&t.range, &t2.range)).is_none())
@@ -111,11 +124,13 @@ mod tests {
                 value: "hello".to_string(),
                 range: 0..5,
                 char_range: 0..5,
+                _normalized: None,
             },
             Token {
                 value: "World".to_string(),
                 range: 6..11,
                 char_range: 6..11,
+                _normalized: None,
             }
         ];
         assert_eq!(retrieved, expected);
@@ -130,16 +145,19 @@ mod tests {
                 value: "$$".to_string(),
                 range: 0..2,
                 char_range: 0..2,
+                _normalized: None,
             },
             Token {
                 value: "%".to_string(),
                 range: 3..4,
                 char_range: 3..4,
+                _normalized: None,
             },
             Token {
                 value: "!!".to_string(),
                 range: 5..7,
                 char_range: 5..7,
+                _normalized: None,
             },
         ];
         assert_eq!(retrieved, expected);
@@ -155,5 +173,23 @@ mod tests {
                                          ("b c".to_string(), vec![1, 2]),
                                          ("c".to_string(), vec![2])];
         assert_eq!(result, expected)
+    }
+
+    #[test]
+    fn normalized_value_should_be_lazy() {
+        // Given
+        let mut token = Token {
+            value: "HellÖ".to_string(),
+            range: 0..6,
+            char_range: 0..5,
+            _normalized: None
+        };
+
+        // When
+        let normalized_value = token.normalized_value();
+
+        // Then
+        assert_eq!("hello".to_string(), normalized_value);
+        assert_eq!(Some("hello".to_string()), token._normalized);
     }
 }
