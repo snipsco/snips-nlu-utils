@@ -2,9 +2,10 @@ use std::cmp::min;
 use std::ops::Range;
 use itertools::Itertools;
 
+use language::Language;
 use regex::{Regex, RegexBuilder};
-use string::{convert_to_char_range, normalize};
 use range::ranges_overlap;
+use string::{convert_to_char_range, normalize};
 
 pub type Ngrams = (String, Vec<usize>);
 
@@ -20,7 +21,7 @@ pub struct Token {
 
 impl Token {
     pub fn new(value: String, range: Range<usize>, char_range: Range<usize>) -> Self {
-        Token {value, range, char_range, _normalized: None}
+        Token { value, range, char_range, _normalized: None }
     }
 
     pub fn normalized_value(&mut self) -> String {
@@ -33,7 +34,7 @@ impl Token {
     }
 }
 
-pub fn tokenize(input: &str) -> Vec<Token> {
+pub fn tokenize(input: &str, language: &Language) -> Vec<Token> {
     lazy_static! {
         static ref WORD_REGEX: Regex = RegexBuilder::new(r"\w+").unicode(true).build().unwrap();
         static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]+", CURRENCIES)).unicode(true).build().unwrap();
@@ -41,8 +42,8 @@ pub fn tokenize(input: &str) -> Vec<Token> {
     _tokenize(input, &[&WORD_REGEX, &SYMBOL_REGEX])
 }
 
-pub fn tokenize_light(input: &str) -> Vec<String> {
-    tokenize(input).into_iter().map(|t| t.value).collect_vec()
+pub fn tokenize_light(input: &str, language: &Language) -> Vec<String> {
+    tokenize(input, language).into_iter().map(|t| t.value).collect_vec()
 }
 
 fn _tokenize(input: &str, regexes: &[&Regex]) -> Vec<Token> {
@@ -108,21 +109,24 @@ mod tests {
     #[test]
     fn tokenize_empty_string_works() {
         let text = "";
-        let retrieved = tokenize(text);
+        let language = Language::EN;
+        let retrieved = tokenize(text, &language);
         assert_eq!(retrieved, vec![]);
     }
 
     #[test]
     fn tokenize_only_whitespaces_works() {
         let text = "                ";
-        let retrieved = tokenize(text);
+        let language = Language::EN;
+        let retrieved = tokenize(text, &language);
         assert_eq!(retrieved, vec![]);
     }
 
     #[test]
     fn tokenize_literals_works() {
         let text = "hello World";
-        let retrieved = tokenize(text);
+        let language = Language::EN;
+        let retrieved = tokenize(text, &language);
         let expected = vec![
             Token {
                 value: "hello".to_string(),
@@ -143,7 +147,8 @@ mod tests {
     #[test]
     fn tokenize_symbols_works() {
         let text = "$$ % !!";
-        let retrieved = tokenize(text);
+        let language = Language::EN;
+        let retrieved = tokenize(text, &language);
         let expected = vec![
             Token {
                 value: "$$".to_string(),
