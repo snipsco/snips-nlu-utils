@@ -7,6 +7,7 @@ use regex::{Regex, RegexBuilder};
 use range::ranges_overlap;
 use string::{convert_to_char_range, normalize};
 
+
 pub type Ngrams = (String, Vec<usize>);
 
 const CURRENCIES: &str = "$؋ƒ៛¥₡₱£€¢﷼₪₩₭₨₮₦₽฿₴₫";
@@ -39,14 +40,18 @@ pub fn tokenize(input: &str, language: &Language) -> Vec<Token> {
         static ref WORD_REGEX: Regex = RegexBuilder::new(r"\w+").unicode(true).build().unwrap();
         static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]+", CURRENCIES)).unicode(true).build().unwrap();
     }
-    _tokenize(input, &[&WORD_REGEX, &SYMBOL_REGEX])
+    match language {
+        _ => _regex_tokenization(input, &[&WORD_REGEX, &SYMBOL_REGEX])
+    }
 }
+
 
 pub fn tokenize_light(input: &str, language: &Language) -> Vec<String> {
     tokenize(input, language).into_iter().map(|t| t.value).collect_vec()
 }
 
-fn _tokenize(input: &str, regexes: &[&Regex]) -> Vec<Token> {
+
+fn _regex_tokenization(input: &str, regexes: &[&Regex]) -> Vec<Token> {
     let mut non_overlapping_tokens: Vec<Token> = vec![];
 
     for r in regexes {
