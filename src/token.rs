@@ -35,7 +35,7 @@ impl Token {
     }
 }
 
-pub fn tokenize(input: &str, language: &Language) -> Vec<Token> {
+pub fn tokenize(input: &str, language: Language) -> Vec<Token> {
     lazy_static! {
         static ref WORD_REGEX: Regex = RegexBuilder::new(r"\w+").unicode(true).build().unwrap();
         static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]+", CURRENCIES)).unicode(true).build().unwrap();
@@ -46,7 +46,7 @@ pub fn tokenize(input: &str, language: &Language) -> Vec<Token> {
 }
 
 
-pub fn tokenize_light(input: &str, language: &Language) -> Vec<String> {
+pub fn tokenize_light(input: &str, language: Language) -> Vec<String> {
     tokenize(input, language).into_iter().map(|t| t.value).collect_vec()
 }
 
@@ -115,7 +115,7 @@ mod tests {
     fn tokenize_empty_string_works() {
         let text = "";
         let language = Language::EN;
-        let retrieved = tokenize(text, &language);
+        let retrieved = tokenize(text, language);
         assert_eq!(retrieved, vec![]);
     }
 
@@ -123,7 +123,7 @@ mod tests {
     fn tokenize_only_whitespaces_works() {
         let text = "                ";
         let language = Language::EN;
-        let retrieved = tokenize(text, &language);
+        let retrieved = tokenize(text, language);
         assert_eq!(retrieved, vec![]);
     }
 
@@ -131,7 +131,7 @@ mod tests {
     fn tokenize_literals_works() {
         let text = "hello World";
         let language = Language::EN;
-        let retrieved = tokenize(text, &language);
+        let retrieved = tokenize(text, language);
         let expected = vec![
             Token {
                 value: "hello".to_string(),
@@ -153,7 +153,7 @@ mod tests {
     fn tokenize_symbols_works() {
         let text = "$$ % !!";
         let language = Language::EN;
-        let retrieved = tokenize(text, &language);
+        let retrieved = tokenize(text, language);
         let expected = vec![
             Token {
                 value: "$$".to_string(),
