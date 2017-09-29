@@ -6,7 +6,6 @@ node('jenkins-slave-ec2') {
     env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
 
     stage('Setup') {
-        sh "rustup update"
         deleteDir()
         checkout scm
     }
