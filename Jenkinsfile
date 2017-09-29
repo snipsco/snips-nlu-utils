@@ -1,9 +1,6 @@
-def branchName = "${env.BRANCH_NAME}"
+@Library('snips') _
 
-def version(path) {
-    def versionLine = readFile("${path}/Cargo.toml").split("\n")[2]
-    versionLine.substring(11, versionLine.length()-1)
-}
+def branchName = "${env.BRANCH_NAME}"
 
 node('jenkins-slave-ec2') {
     env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
@@ -24,13 +21,14 @@ node('jenkins-slave-ec2') {
 
     if(branchName == "master") {
         stage('Publish release') {
-            def rootPath = pwd()
+            def version = extractCargoVersion("./Cargo.toml")
+
             sh """
             git remote rm origin
             git remote add origin 'git@github.com:snipsco/nlu-utils.git'
             git config --global user.email 'jenkins@snips.ai'
             git config --global user.name 'Jenkins'
-            git tag ${version(rootPath)}
+            git tag ${version}
             git push --tags
             """
         }
