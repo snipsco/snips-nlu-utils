@@ -1,6 +1,6 @@
 [package]
 name = "nlu-utils"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
 [dependencies]
