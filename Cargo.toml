@@ -5,7 +5,7 @@ authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
 [dependencies]
 error-chain = { version = "0.11", default-features = false }
-itertools = "0.6"
+itertools = "0.7"
 lazy_static = "0.2"
 libc = "0.2"
 regex = "0.2"
