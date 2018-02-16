@@ -12,11 +12,11 @@ def version(path) {
     readFile("${path}/__version__").split("\n")[0]
 }
 
-def uploadAsset(pythonPath, venvName, asset="bdist_wheel") {
+def uploadAsset(pythonPath, venvPath, asset="bdist_wheel") {
     env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
 
-    def VIRTUALENV = "virtualenv -p $pythonPath $venvName"
-    def VENV = ". ${venvName}/bin/activate"
+    def VIRTUALENV = "virtualenv -p $pythonPath $venvPath"
+    def VENV = ". ${venvPath}/bin/activate"
 
     sh """
     cd python
@@ -27,19 +27,19 @@ def uploadAsset(pythonPath, venvName, asset="bdist_wheel") {
     """
 }
 
-def buildAndTest(pythonPath, venvName) {
+def buildAndTest(pythonPath, venvPath) {
     def branchName = "${env.BRANCH_NAME}"
     env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
 
-    def VIRTUALENV = "virtualenv -p $pythonPath $venvName"
-    def VENV = ". ${venvName}/bin/activate"
+    def VIRTUALENV = "virtualenv -p $pythonPath $venvPath"
+    def VENV = ". ${venvPath}/bin/activate"
 
     stage('Setup') {
         deleteDir()
         checkout scm
         sh """
         cd python
-        rm -rf ${venvName}
+        rm -rf ${venvPath}
         ${VIRTUALENV}
         ${VENV}
         pip install -r requirements.txt
@@ -77,11 +77,13 @@ node('jenkins-slave-ec2') {
     stage('Python build') {
         builders['linux-x86_64'] = {
             node('jenkins-slave-ec2') {
+                checkout scm
+                def id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                 def python27path = sh(returnStdout: true, script: 'which python2.7').trim()
                 def python34path = sh(returnStdout: true, script: 'which python3.4').trim()
 
-                buildAndTest(python27path, "venv27")
-                buildAndTest(python34path, "venv34")
+                buildAndTest(python27path, "/tmp/venv27-$id-${env.EXECUTOR_NUMBER}")
+                buildAndTest(python34path, "/tmp/venv34-$id-${env.EXECUTOR_NUMBER}")
             }
         }
 
