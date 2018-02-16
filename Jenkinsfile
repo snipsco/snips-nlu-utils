@@ -27,10 +27,21 @@ def uploadAsset(pythonPath, venvPath, asset="bdist_wheel") {
     """
 }
 
-def buildAndTest(pythonPath, venvPath) {
-    def branchName = "${env.BRANCH_NAME}"
-    env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
 
+def rustBuildAndTest(){
+    env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
+    checkout scm
+
+    stage('Rust build') {
+        sh "cargo build --all"
+    }
+
+    stage('Rust tests') {
+        sh "cargo test --all"
+    }
+}
+
+def pythonBuildAndTest(pythonPath, venvPath) {
     def VIRTUALENV = "virtualenv -p $pythonPath $venvPath"
     def VENV = ". ${venvPath}/bin/activate"
 
@@ -44,14 +55,6 @@ def buildAndTest(pythonPath, venvPath) {
         ${VENV}
         pip install -r requirements.txt
         """
-    }
-
-    stage('Rust build') {
-        sh "cargo build --all"
-    }
-
-    stage('Rust tests') {
-        sh "cargo test --all"
     }
 
     stage('Python build') {
@@ -74,7 +77,7 @@ def buildAndTest(pythonPath, venvPath) {
 
 node('jenkins-slave-ec2') {
 
-    stage('Python build') {
+    stage('Build') {
         builders['linux-x86_64'] = {
             node('jenkins-slave-ec2') {
                 checkout scm
@@ -82,22 +85,26 @@ node('jenkins-slave-ec2') {
                 def python27path = sh(returnStdout: true, script: 'which python2.7').trim()
                 def python34path = sh(returnStdout: true, script: 'which python3.4').trim()
 
-                buildAndTest(python27path, "/tmp/venv27-$id-${env.EXECUTOR_NUMBER}")
-                buildAndTest(python34path, "/tmp/venv34-$id-${env.EXECUTOR_NUMBER}")
+                rustBuildAndTest()
+
+                pythonBuildAndTest(python27path, "/tmp/venv27-$id-${env.EXECUTOR_NUMBER}")
+                pythonBuildAndTest(python34path, "/tmp/venv34-$id-${env.EXECUTOR_NUMBER}")
             }
         }
 
         builders['apple-macos-compile'] = {
            node('macos') {
+                rustBuildAndTest()
+
                 def python27path = sh(returnStdout: true, script: 'which python2.7').trim()
                 def python34path = sh(returnStdout: true, script: 'which python3.4').trim()
                 def python35path = sh(returnStdout: true, script: 'which python3.5').trim()
                 def python36path = sh(returnStdout: true, script: 'which python3.6').trim()
 
-                buildAndTest(python27path, "venv27")
-                buildAndTest(python34path, "venv34")
-                buildAndTest(python35path, "venv35")
-                buildAndTest(python36path, "venv36")
+                pythonBuildAndTest(python27path, "venv27")
+                pythonBuildAndTest(python34path, "venv34")
+                pythonBuildAndTest(python35path, "venv35")
+                pythonBuildAndTest(python36path, "venv36")
            }
         }
 
