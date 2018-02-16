@@ -1,0 +1,5 @@
+include nlu_utils/__version__
+recursive-include nlu_utils *.so
+include nlu_utils_py/Cargo.toml
+recursive-include nlu_utils_py/src *.rs
+global-exclude __pycache__ *.py[cod]
