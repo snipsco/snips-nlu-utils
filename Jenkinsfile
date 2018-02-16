@@ -32,7 +32,7 @@ def buildAndTest(pythonPath, venvName) {
     env.PATH = "/usr/local/bin:${env.HOME}/.cargo/bin:${env.PATH}"
 
     def VIRTUALENV = "virtualenv -p $pythonPath $venvName"
-    def VENV = "source ${venvName}/bin/activate"
+    def VENV = ". ${venvName}/bin/activate"
 
     stage('Setup') {
         deleteDir()
