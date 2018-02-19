@@ -1,12 +1,12 @@
 [package]
-name = "nlu-utils-py"
-version = "0.6.0-SNAPSHOT"
+name = "snips-nlu-utils-py"
+version = "0.5.1"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
 [lib]
-name = "nlu_utils_py"
+name = "snisp_nlu_utils_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-nlu-utils = { path = "../.."}
+snips-nlu-utils = { path = "../.."}
 cpython = { version="0.1", default-features=false }

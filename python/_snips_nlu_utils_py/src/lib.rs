@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate cpython;
-extern crate nlu_utils;
+extern crate snips_nlu_utils;
 
 pub mod token;
 pub mod string;
