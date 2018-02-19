@@ -1,7 +1,4 @@
-language:
-  - rust:
-    stable
-  - python
+language: python
 
 env:
   global:
@@ -41,6 +38,9 @@ matrix:
       env:
         - TOXENV=py36
         - PYTHON_VERSION=3.6
+
+before_install:
+  - curl https://sh.rustup.rs -sSf | bash -s -- -y
 
 install:
   - pip install virtualenv
