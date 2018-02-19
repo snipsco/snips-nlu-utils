@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 source .travis/common.sh
 
-rustBuildAndTest () {
+rustBuild () {
     echo "Rust build and test"
 
     export PATH="/usr/local/bin:$HOME/.cargo/bin:$PATH"
 
     cargo build --all  || \
         die "Rust build failed"
-
-    cargo test --all || \
-        die "Rust test failed"
 }
 
 pythonBuild () {
@@ -28,12 +25,12 @@ pythonBuild () {
         die "Failed to install requirements"
 
     echo "Python build..."
-    ssh-agent sh -c "ssh-add; pip install -e '.[test]' --verbose" || \
+    ssh-agent sh -c "ssh-add; pip install -e --verbose" || \
         die "Failed to install Python"
 }
 
 updateVersions ${TAG_VERSION}
 
-rustBuildAndTest
+rustBuild
 
 pythonBuild ${PYTHON_PATH} ${VENV_PATH}
