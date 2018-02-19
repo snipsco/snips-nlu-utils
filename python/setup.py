@@ -28,11 +28,19 @@ required = [
     "future==0.16.0"
 ]
 
+extras_require = {
+    "test": [
+        "tox==2.9.1"
+    ]
+}
+
+
 setup(name=PACKAGE_NAME,
       version=version,
       author="Adrien Ball",
       author_email="adrien.ball@snips.ai",
       install_requires=required,
+      extras_require=extras_require,
       rust_extensions=[RustExtension(RUST_EXTENSION_NAME, CARGO_FILE_PATH,
                                      **rust_kwargs)],
       packages=packages,

@@ -28,7 +28,7 @@ pythonBuild () {
         die "Failed to install requirements"
 
     echo "Python build..."
-    ssh-agent sh -c "ssh-add; pip install -e . --verbose" || \
+    ssh-agent sh -c "ssh-add; pip install -e '.[test]' --verbose" || \
         die "Failed to install Python"
 }
 
