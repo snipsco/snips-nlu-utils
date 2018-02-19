@@ -2,6 +2,7 @@
 source .travis/common.sh
 
 echo "Rust tests..."
+export PATH="/usr/local/bin:$HOME/.cargo/bin:$PATH"
 cargo test --all || \
         die "Rust test failed"
 
