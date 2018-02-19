@@ -96,7 +96,8 @@ uploadAsset() {
 
     cd python
     . ${venvPath}/bin/activate
-    ssh-agent sh -c "ssh-add; python setup.py ${asset} upload -r pypisnips"  || \
+    pip install twine
+    ssh-agent sh -c "ssh-add; python setup.py ${asset}; twine upload -u ${PYPI_USER} -p ${PYPI_ENCRYPTED_PWD}" || \
       die "Failed to build and and upload asset"
 }
 
@@ -131,7 +132,7 @@ if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
 	publish
 
 	# Build and publish Python wheel
-	echo "Uploading python weel..."
+	echo "Uploading python wheel..."
 	uploadAsset ${VENV_PATH} bdist_wheel
 
 	# Publish source distribution only once
