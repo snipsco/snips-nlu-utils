@@ -96,14 +96,14 @@ uploadAsset() {
 
     cd python
     . ${venvPath}/bin/activate
-    ssh-agent sh -c \" ssh-add; python setup.py ${asset} upload -r pypisnips \"  || \
+    ssh-agent sh -c "ssh-add; python setup.py ${asset} upload -r pypisnips"  || \
       die "Failed to build and and upload asset"
 }
 
 echo ${BRANCH}
 if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
     echo "Performing release..."
-
+    git stash
     git config --global user.email 'tobor.spins@snips.net'
     git config --global user.name 'Tobor'
 

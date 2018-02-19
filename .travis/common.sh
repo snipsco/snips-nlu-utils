@@ -24,7 +24,7 @@ parseRustVersion() {
 updateVersions() {
     local tagVersion=$1
     echo "Updating version..."
-    ssh-agent sh -c "./update_version.sh $tagVersion" || \
+    ssh-agent sh -c "ssh-add; ./update_version.sh $tagVersion" || \
         die "Could not upload version"
 }
 
