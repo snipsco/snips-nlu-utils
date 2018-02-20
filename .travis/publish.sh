@@ -54,7 +54,6 @@ performTag() {
     # in case a previous attempt to finish this release branch has failed,
     # but the tag was set successful, we skip it now
     if ! gitTagExists "$TAG_VERSION"; then
-        git checkout MASTER_BRANCH
         git tag -a "$TAG_VERSION" -m "Release ${BRANCH}" || \
             die "Tagging failed. Please run finish again to retry."
     fi
