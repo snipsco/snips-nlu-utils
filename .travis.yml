@@ -18,31 +18,69 @@ matrix:
       env:
         - TOXENV=py34
         - PYTHON_VERSION=3.4
-    - os: osx
-      python: 2.7
-      env:
-        - TOXENV=py27
-        - PYTHON_VERSION=2.7
-    - os: osx
-      python: 3.4
-      env:
-        - TOXENV=py34
-        - PYTHON_VERSION=3.4
-    - os: osx
+    - os: linux
       python: 3.5
       env:
         - TOXENV=py35
         - PYTHON_VERSION=3.5
-    - os: osx
+    - os: linux
       python: 3.6
       env:
         - TOXENV=py36
         - PYTHON_VERSION=3.6
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py27
+        - PYTHON_VERSION=2.7
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py34
+        - PYTHON_VERSION=3.4
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py35
+        - PYTHON_VERSION=3.5
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py36
+        - PYTHON_VERSION=3.6
 
-before_install:
-  - curl https://sh.rustup.rs -sSf | bash -s -- -y
+before_install: |
+  # Install Rust
+  curl https://sh.rustup.rs -sSf | bash -s -- -y
+  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    brew update
+
+    # Per the `pyenv homebrew recommendations <https://github.com/yyuu/pyenv/wiki#suggested-build-environment>`_.
+    brew install openssl readline
+
+    # See https://docs.travis-ci.com/user/osx-ci-environment/#A-note-on-upgrading-packages.
+    # I didn't do this above because it works and I'm lazy.
+    brew outdated pyenv || brew upgrade pyenv
+
+    # virtualenv doesn't work without pyenv knowledge. venv in Python 3.3
+    # doesn't provide Pip by default. So, use `pyenv-virtualenv <https://github.com/yyuu/pyenv-virtualenv/blob/master/README.md>`_.
+    brew install pyenv-virtualenv
+    pyenv install $PYTHON
+
+    # I would expect something like ``pyenv init; pyenv local $PYTHON`` or
+    # ``pyenv shell $PYTHON`` would work, but ``pyenv init`` doesn't seem to
+    # modify the Bash environment. ??? So, I hand-set the variables instead.
+    export PYENV_VERSION=$PYTHON
+    export PATH="/Users/travis/.pyenv/shims:${PATH}"
+    pyenv-virtualenv venv
+    source venv/bin/activate
+
+    # A manual check that the correct version of Python is running.
+    python --version
+  fi
 
 install:
+  - python -m pip install -U pip
   - pip install virtualenv
   - ./.travis/install.sh
 
