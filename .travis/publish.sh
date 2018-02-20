@@ -124,7 +124,7 @@ if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
 
     # Delete branch
     echo "Deleting current branch..."
-    # deleteBranch
+    deleteBranch
     
     # Publish code
     echo "Publishing code on Github..."
