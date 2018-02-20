@@ -98,3 +98,9 @@ install:
 
 script:
   - ./.travis/test.sh
+
+deploy:
+  provider: script
+  script: bash ./.travis/publish.sh
+  on:
+    condition: ${TRAVIS_EVENT_TYPE} == "pull_request" && (${TRAVIS_PULL_REQUEST_BRANCH} == hotfix* || ${TRAVIS_PULL_REQUEST_BRANCH} == release/*)
