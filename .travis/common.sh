@@ -2,7 +2,7 @@
 
 PYTHON_PATH=$(which python"$PYTHON_VERSION")
 COMMIT_ID=$(git rev-parse --short HEAD)
-VENV_PATH="/tmp/venv27-$COMMIT_ID"
+VENV_PATH="/tmp/venv$PYTHON_VERSION-$COMMIT_ID"
 
 warn() { echo "$@" >&2; }
 
