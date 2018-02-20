@@ -122,10 +122,6 @@ if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
     echo "Merging master into development branch..."
     mergeIntoDevelopBranch
 
-    # Delete branch
-    echo "Deleting current branch..."
-    deleteBranch
-    
     # Publish code
     echo "Publishing code on Github..."
     publish
