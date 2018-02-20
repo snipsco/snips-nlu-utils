@@ -61,25 +61,25 @@ before_install: |
     # See https://docs.travis-ci.com/user/osx-ci-environment/#A-note-on-upgrading-packages.
     # I didn't do this above because it works and I'm lazy.
     brew outdated pyenv || brew upgrade pyenv
-   case "${TOXENV}" in
-      py27)
-          curl -O https://bootstrap.pypa.io/get-pip.py
-          python get-pip.py --user
-          ;;
-      py34)
-          pyenv install 3.4.6
-          pyenv global 3.4.6
-          ;;
-      py35)
-          pyenv install 3.5.3
-          pyenv global 3.5.3
-          ;;
-      py36)
-          pyenv install 3.6.1
-          pyenv global 3.6.1
-          ;;
-    esac
 
+    case "${TOXENV}" in
+      py27)
+        curl -O https://bootstrap.pypa.io/get-pip.py
+        python get-pip.py --user
+        ;;
+      py34)
+        pyenv install 3.4.6
+        pyenv global 3.4.6
+        ;;
+      py35)
+        pyenv install 3.5.3
+        pyenv global 3.5.3
+        ;;
+      py36)
+        pyenv install 3.6.1
+        pyenv global 3.6.1
+        ;;
+    esac
     pyenv rehash
     python -m pip install --user virtualenv
 
