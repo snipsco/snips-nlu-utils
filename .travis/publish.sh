@@ -96,8 +96,10 @@ uploadAsset() {
     cd python
     . ${venvPath}/bin/activate
     pip install twine
-    ssh-agent sh -c "ssh-add; python setup.py ${asset}; twine upload -u ${PYPI_USER} -p ${PYPI_ENCRYPTED_PWD}" || \
-      die "Failed to build and and upload asset"
+    python setup.py ${asset} || \
+      die "Failed to build asset"
+    twine upload -u ${PYPI_USER} -p ${PYPI_ENCRYPTED_PWD} || \
+      die "Failed to upload asset"
 }
 
 echo ${BRANCH}
