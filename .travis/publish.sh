@@ -6,20 +6,20 @@ DEVELOP_BRANCH="develop"
 BRANCH=${TRAVIS_BRANCH_NAME}
 
 branchIsMergedInto() {
-	local subject=$1
-	local base=$2
-	local allMerges="$(git branch --no-color --contains ${subject} | sed 's/^[* ] //')"
-	has ${base} ${allMerges}
+    local subject=$1
+    local base=$2
+    local allMerges="$(git branch --no-color --contains ${subject} | sed 's/^[* ] //')"
+    has ${base} ${allMerges}
 }
 
 gitAllTags() { git tag; }
 
 gitCurrentBranch() {
-	git branch --no-color | grep '^\* ' | grep -v 'no branch' | sed 's/^* //g'
+    git branch --no-color | grep '^\* ' | grep -v 'no branch' | sed 's/^* //g'
 }
 
 gitTagExists() {
-	has $1 $(gitAllTags)
+    has $1 $(gitAllTags)
 }
 
 updateAndCommitVersions() {
@@ -31,22 +31,22 @@ updateAndCommitVersions() {
         echo "Commit changes..."
         # Commit the version update
         git add python  || \
-		    die "Failed to add changes"
+            die "Failed to add changes"
         git commit -m "Update Python tag version to $TAG_VERSION" || \
-	        die "Failed to commit version update"
-	fi
+            die "Failed to commit version update"
+    fi
 }
 
 mergeIntoMasterBranch() {
     # try to merge into master
-	# in case a previous attempt to finish this release branch has failed,
-	# but the merge into master was successful, we skip it now
-	if ! branchIsMergedInto "$BRANCH" "$MASTER_BRANCH"; then
-		git checkout "$MASTER_BRANCH" || \
-		    die "Could not check out $MASTER_BRANCH."
+    # in case a previous attempt to finish this release branch has failed,
+    # but the merge into master was successful, we skip it now
+    if ! branchIsMergedInto "$BRANCH" "$MASTER_BRANCH"; then
+        git checkout "$MASTER_BRANCH" || \
+            die "Could not check out $MASTER_BRANCH."
         git merge --no-ff ${BRANCH} || \
             die "There were merge conflicts."
-	fi
+    fi
 }
 
 performTag() {
@@ -62,12 +62,12 @@ performTag() {
 
 mergeIntoDevelopBranch() {
     if ! branchIsMergedInto "$BRANCH" "$DEVELOP_BRANCH"; then
-		git checkout "$DEVELOP_BRANCH" || \
-		  die "Could not check out $DEVELOP_BRANCH."
+        git checkout "$DEVELOP_BRANCH" || \
+          die "Could not check out $DEVELOP_BRANCH."
 
         git merge --no-ff "$BRANCH" || \
             die "There were merge conflicts."
-	fi
+    fi
 
 }
 
@@ -125,19 +125,19 @@ if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
 
     # Delete branch
     echo "Deleting current branch..."
-	# deleteBranch
-	
-	# Publish code
-	echo "Publishing code on Github..."
-	publish
+    # deleteBranch
+    
+    # Publish code
+    echo "Publishing code on Github..."
+    publish
 
-	# Build and publish Python wheel
-	echo "Uploading python wheel..."
-	uploadAsset ${VENV_PATH} bdist_wheel
+    # Build and publish Python wheel
+    echo "Uploading python wheel..."
+    uploadAsset ${VENV_PATH} bdist_wheel
 
-	# Publish source distribution only once
-	if [ ${TRAVIS_OS_NAME} == "*osx" ] && [${PYTHON_VERSION} == "2.7"]; then
-	    echo "Uploading source distribution..."
-	    uploadAsset ${VENV_PATH} sdist
-	fi
+    # Publish source distribution only once
+    if [ ${TRAVIS_OS_NAME} == "*osx" ] && [${PYTHON_VERSION} == "2.7"]; then
+        echo "Uploading source distribution..."
+        uploadAsset ${VENV_PATH} sdist
+    fi
 fi
