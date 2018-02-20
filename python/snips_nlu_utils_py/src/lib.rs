@@ -10,7 +10,7 @@ use cpython::{PyList, PyUnicode};
 use string::{normalize, remove_diacritics};
 use token::{tokenize, tokenize_light, compute_all_ngrams};
 
-py_module_initializer!(_nlu_utils_py, init_nlu_utils_py, PyInit__nlu_utils_py, |py, m| {
+py_module_initializer!(_snips_nlu_utils_py, init_snips_nlu_utils_py, PyInit__snips_nlu_utils_py, |py, m| {
     m.add(py, "tokenize", py_fn!(py, tokenize(input: PyUnicode, language: PyUnicode)))?;
     m.add(py, "tokenize_light", py_fn!(py, tokenize_light(input: PyUnicode, language: PyUnicode)))?;
     m.add(py, "compute_all_ngrams", py_fn!(py, compute_all_ngrams(tokens: PyList, max_ngram_size: i32)))?;

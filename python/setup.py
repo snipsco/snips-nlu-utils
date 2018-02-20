@@ -17,8 +17,8 @@ PACKAGE_NAME = "snips_nlu_utils"
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 PACKAGE_PATH = os.path.join(ROOT_PATH, PACKAGE_NAME)
 
-CARGO_FILE_PATH = os.path.join(ROOT_PATH, '_snips_nlu_utils_py', 'Cargo.toml')
-RUST_EXTENSION_NAME = '_snips_nlu_utils._nlu_utils_py'
+CARGO_FILE_PATH = os.path.join(ROOT_PATH, 'snips_nlu_utils_py', 'Cargo.toml')
+RUST_EXTENSION_NAME = 'snips_nlu_utils._snips_nlu_utils_py'
 
 VERSION = "__version__"
 with io.open(os.path.join(PACKAGE_PATH, VERSION)) as f:

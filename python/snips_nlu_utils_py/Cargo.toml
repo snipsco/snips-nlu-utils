@@ -4,7 +4,7 @@ version = "0.5.2"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
 [lib]
-name = "snisp_nlu_utils_py"
+name = "_snips_nlu_utils_py"
 crate-type = ["cdylib"]
 
 [dependencies]
