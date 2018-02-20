@@ -44,7 +44,7 @@ mergeIntoMasterBranch() {
     if ! branchIsMergedInto "$BUILD_BRANCH" "$MASTER_BRANCH"; then
         git checkout "$MASTER_BRANCH" || \
             die "Could not check out $MASTER_BRANCH."
-        git merge --no-ff ${BRANCH} || \
+        git merge --no-ff ${BUILD_BRANCH} || \
             die "There were merge conflicts."
     fi
 }
@@ -54,7 +54,7 @@ performTag() {
     # in case a previous attempt to finish this release branch has failed,
     # but the tag was set successful, we skip it now
     if ! gitTagExists "$TAG_VERSION"; then
-        git tag -a "$TAG_VERSION" -m "Release ${BRANCH}" || \
+        git tag -a "$TAG_VERSION" -m "Release ${BUILD_BRANCH}" || \
             die "Tagging failed. Please run finish again to retry."
     fi
 }
@@ -99,6 +99,7 @@ echo "Performing release triggered by branch ${BUILD_BRANCH}"
 git stash
 git config --global user.email 'tobor.spins@snips.net'
 git config --global user.name 'Tobor'
+git fetch
 
 # Align versions
 updateAndCommitVersions "python/snips_nlu_utils/__version__"
