@@ -3,7 +3,7 @@ source .travis/common.sh
 
 MASTER_BRANCH="master"
 DEVELOP_BRANCH="develop"
-BUILD_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
+BUILD_BRANCH=${TRAVIS_BRANCH}
 
 branchIsMergedInto() {
     local subject=$1
