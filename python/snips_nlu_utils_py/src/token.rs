@@ -2,8 +2,8 @@ use std::borrow::Borrow;
 use std::str::FromStr;
 
 use cpython::{Python, PyResult, PyUnicode, PyList, PythonObject};
-use nlu_utils::language::Language;
-use nlu_utils::token as token_utils;
+use snips_nlu_utils::language::Language;
+use snips_nlu_utils::token as token_utils;
 
 use binding_utils::{IntoPyDict, PyResultBinding};
 

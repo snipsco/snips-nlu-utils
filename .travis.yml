@@ -1,0 +1,97 @@
+language: python
+
+env:
+  global:
+    - secure: "NkrnHOK8A75Y9gpb2oGepd4nkFpVwoXgew2j/RyPfUJ9ZU87lDQR3Cey6DY0TVCpmcaXbhR8qOPqvU4FqAXW2yKDhJSqqf5iNrO22KX/jKoRZXTb6NwdNK+yfTuYD+SLsXuFn3Fj7Y951KMahv2pH4tHpGgLKm835VE+AGuvg3Y/8sSe0Mk6SRl8A2A/hTW4F7ww41VRV6w1i0UpRwq2YC6Bdpbu8iVXezL1/hpVj5TSx829EJI19DwtjN9pK0BtEcdVw0XG0QjQWxI/bksaBjr230DSfbtdJGmL08TAjqBEDom4d8W96KDeEWigM98bD9DrK/wkx0I/6VcIOtDuH7NHhOe83FUvxcZwgknv6qUrVWF/RxZ+OvvOBfmcOPqeePA6bDOf/Q1w0FeROera9XGYlwUlYMbjpq/wk3nFNSDI+KhpN1NXtlKBIRAUIRBQBK6NRlO1SXtZCwktAThCGv6NGJOW44ZT+25DPj/JsWyoDvyr0ezjF+4HnJGD4+0nNHg4Cl9HasPrUgmmC5Abi5FYC9X5SJW9QRjyZluuhqDwf/xkNNNqC+63Hdol8DvK4bmFBRSauCOyjSyYsrVKE2OUUk2jYF5zt7P43UKdupd/FmP5UYfP0JRrAFfWGETqYzA7+RCJb5LSWy1xase9Dwg8ZQddlVs7xE40vHYLSJk="
+    - secure: "PjoqQZPD34OvX3yWRbaFVrpdwTczQA/00feodS4bYpGXYDQGb2tY7RQ6mn9LMZcz/2At5DxUkDQnl/kI7EsUbPu01dj3dcVTdpGvYYXHboXZb8/SVVFw9jN2nqKelV8KQ/P6AdACXefFQDsPt2TZXkCJgqXQi+Er0FsM4g/RDHXeT65s2Qmvjlbd5XPWpwiKkfhS+legZaNi1j7RfpLCOWoY/QeN2HBuunMnKVomGGzsqQUwtwEX/gmVPc8ne9ZmbCVPzQH0LGMQa1rBT6ToQEeaJtzZw8F9QdQmkopkcKp8fCQ8mqXzYVjMGkhXIKZbmdC82fn+MmCBSpNEaKHjV1Glb0yaH+i4pz2JEfx0tH09LytfqwChdhFPerdPr5r7T7zlL+AKev8YYpG3A2cfoC6yiUh/sC8Rmkj778DWWZI4X+e3fHA0URL9BIyj0g7nU8PuECyzDM8NJ962zEEADh07kZLTwPd4iHUMzCmSMbkHfVPlqOrAjT4h9C+uazHft/kOqrIr0n1eNFo75iHyvEZ+wZv0MoboT0wmHopf5vEzNXKNiIUSdsLYo26CuF4NNU9FqniR0u/Yh1oyBjCy4wFHZbZ6bNU+/wWG27R0r6jnuOx0cM+Ivq4M5LqrjkPPREzHbK7D2rYsYINwUsfptkrf9uCj0zyhzmXA/KiQG90="
+
+
+matrix:
+  include:
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py27
+        - PYTHON_VERSION=2.7
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py34
+        - PYTHON_VERSION=3.4
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py35
+        - PYTHON_VERSION=3.5
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py36
+        - PYTHON_VERSION=3.6
+    - os: linux
+      python: 2.7
+      env:
+        - TOXENV=py27
+        - PYTHON_VERSION=2.7
+    - os: linux
+      python: 3.4
+      env:
+        - TOXENV=py34
+        - PYTHON_VERSION=3.4
+    - os: linux
+      python: 3.5
+      env:
+        - TOXENV=py35
+        - PYTHON_VERSION=3.5
+    - os: linux
+      python: 3.6
+      env:
+        - TOXENV=py36
+        - PYTHON_VERSION=3.6
+
+before_install: |
+  # Install Rust
+  curl https://sh.rustup.rs -sSf | bash -s -- -y
+  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    brew update || brew update
+
+    brew outdated openssl || brew upgrade openssl
+    brew install openssl@1.1
+
+    # install pyenv
+    git clone --depth 1 https://github.com/pyenv/pyenv ~/.pyenv
+    PYENV_ROOT="$HOME/.pyenv"
+    PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+
+    case "${TOXENV}" in
+      py27)
+        curl -O https://bootstrap.pypa.io/get-pip.py
+        python get-pip.py --user
+        ;;
+      py34)
+        pyenv install 3.4.6
+        pyenv global 3.4.6
+        ;;
+      py35)
+        pyenv install 3.5.3
+        pyenv global 3.5.3
+        ;;
+      py36)
+        pyenv install 3.6.1
+        pyenv global 3.6.1
+        ;;
+    esac
+    pyenv rehash
+    python -m pip install --user virtualenv
+
+    # A manual check that the correct version of Python is running.
+    python --version
+  fi
+
+install:
+  - ./.travis/install.sh
+
+script:
+  - ./.travis/test.sh
+  - ./.travis/publish.sh

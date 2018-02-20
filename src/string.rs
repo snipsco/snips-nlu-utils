@@ -67,7 +67,7 @@ pub fn suffix_from_char_index(string: String, index: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// use nlu_utils::string::normalize;
+/// use snips_nlu_utils::string::normalize;
 /// 
 /// assert_eq!("heloa".to_string(), normalize("  HelöÀ "));
 /// ```
@@ -82,7 +82,7 @@ pub fn normalize(string: &str) -> String {
 /// # Examples
 ///
 /// ```
-/// use nlu_utils::string::remove_diacritics;
+/// use snips_nlu_utils::string::remove_diacritics;
 ///
 /// assert_eq!("ceaA".to_owned(), remove_diacritics("çéaÀ"));
 /// ```

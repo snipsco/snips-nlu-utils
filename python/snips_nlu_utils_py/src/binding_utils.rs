@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use nlu_utils::token::{Ngrams, Token};
+use snips_nlu_utils::token::{Ngrams, Token};
 use cpython::{Python, PythonObject, PyResult, PyList, PyDict, PyUnicode, ToPyObject, PyErr};
 
 pub trait PyResultBinding<T> {

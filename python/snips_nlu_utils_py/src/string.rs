@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use nlu_utils::string as string_utils;
+use snips_nlu_utils::string as string_utils;
 
 use cpython::{Python, PyUnicode, PyResult};
 

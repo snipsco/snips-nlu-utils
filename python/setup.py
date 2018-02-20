@@ -13,12 +13,12 @@ except ImportError:
 
 packages = [p for p in find_packages() if "tests" not in p]
 
-PACKAGE_NAME = "nlu_utils"
+PACKAGE_NAME = "snips_nlu_utils"
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 PACKAGE_PATH = os.path.join(ROOT_PATH, PACKAGE_NAME)
 
-CARGO_FILE_PATH = os.path.join(ROOT_PATH, 'nlu_utils_py', 'Cargo.toml')
-RUST_EXTENSION_NAME = 'nlu_utils._nlu_utils_py'
+CARGO_FILE_PATH = os.path.join(ROOT_PATH, 'snips_nlu_utils_py', 'Cargo.toml')
+RUST_EXTENSION_NAME = 'snips_nlu_utils._snips_nlu_utils_py'
 
 VERSION = "__version__"
 with io.open(os.path.join(PACKAGE_PATH, VERSION)) as f:
@@ -28,11 +28,19 @@ required = [
     "future==0.16.0"
 ]
 
+extras_require = {
+    "test": [
+        "tox==2.9.1"
+    ]
+}
+
+
 setup(name=PACKAGE_NAME,
       version=version,
       author="Adrien Ball",
       author_email="adrien.ball@snips.ai",
       install_requires=required,
+      extras_require=extras_require,
       rust_extensions=[RustExtension(RUST_EXTENSION_NAME, CARGO_FILE_PATH,
                                      **rust_kwargs)],
       packages=packages,

@@ -4,7 +4,7 @@ import unittest
 
 from builtins import str, bytes
 
-from nlu_utils import tokenize, tokenize_light
+from snips_nlu_utils import tokenize, tokenize_light
 
 
 class TestNLUUtils(unittest.TestCase):
