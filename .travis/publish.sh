@@ -3,7 +3,7 @@ source .travis/common.sh
 
 MASTER_BRANCH="master"
 DEVELOP_BRANCH="develop"
-BRANCH=${TRAVIS_BRANCH_NAME}
+BUILD_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
 
 branchIsMergedInto() {
     local subject=$1
@@ -41,7 +41,7 @@ mergeIntoMasterBranch() {
     # try to merge into master
     # in case a previous attempt to finish this release branch has failed,
     # but the merge into master was successful, we skip it now
-    if ! branchIsMergedInto "$BRANCH" "$MASTER_BRANCH"; then
+    if ! branchIsMergedInto "$BUILD_BRANCH" "$MASTER_BRANCH"; then
         git checkout "$MASTER_BRANCH" || \
             die "Could not check out $MASTER_BRANCH."
         git merge --no-ff ${BRANCH} || \
@@ -60,22 +60,14 @@ performTag() {
 }
 
 mergeIntoDevelopBranch() {
-    if ! branchIsMergedInto "$BRANCH" "$DEVELOP_BRANCH"; then
+    if ! branchIsMergedInto "$BUILD_BRANCH" "$DEVELOP_BRANCH"; then
         git checkout "$DEVELOP_BRANCH" || \
           die "Could not check out $DEVELOP_BRANCH."
 
-        git merge --no-ff "$BRANCH" || \
+        git merge --no-ff "$BUILD_BRANCH" || \
             die "There were merge conflicts."
     fi
 
-}
-
-deleteBranch() {
-    if [ "$BRANCH" == "$(gitCurrentBranch)" ]; then
-        git checkout "$MASTER_BRANCH"
-    fi
-    git branch -D "$BRANCH" || \
-        die "Failed to delete branch"
 }
 
 publish() {
@@ -85,8 +77,8 @@ publish() {
         die "Could not push to $MASTER_BRANCH from origin."
     git push --tags origin || \
       die "Could not push tags to origin."
-    git push origin :"$BRANCH" || \
-        die "Could not delete the remote $BRANCH in origin."
+    git push origin :"$BUILD_BRANCH" || \
+        die "Could not delete the remote $BUILD_BRANCH in origin."
 }
 
 uploadAsset() {
@@ -102,39 +94,37 @@ uploadAsset() {
       die "Failed to upload asset"
 }
 
-echo ${BRANCH}
-if  [[ ${BRANCH} == release/* ]] || [[ ${BRANCH} == hotfix* ]];then
-    echo "Performing release..."
-    git stash
-    git config --global user.email 'tobor.spins@snips.net'
-    git config --global user.name 'Tobor'
+echo "Performing release triggered by branch ${BUILD_BRANCH}"
 
-    # Align versions
-    updateAndCommitVersions "python/snips_nlu_utils/__version__"
+git stash
+git config --global user.email 'tobor.spins@snips.net'
+git config --global user.name 'Tobor'
 
-    # Merge into master
-    echo "Merging build branch into master..."
-    mergeIntoMasterBranch
+# Align versions
+updateAndCommitVersions "python/snips_nlu_utils/__version__"
 
-    # Perform tag
-    echo "Tagging..."
-    performTag
+# Merge into master
+echo "Merging build branch into master..."
+mergeIntoMasterBranch
 
-    # Merge into develop
-    echo "Merging master into development branch..."
-    mergeIntoDevelopBranch
+# Perform tag
+echo "Tagging..."
+performTag
 
-    # Publish code
-    echo "Publishing code on Github..."
-    publish
+# Merge into develop
+echo "Merging master into development branch..."
+mergeIntoDevelopBranch
 
-    # Build and publish Python wheel
-    echo "Uploading python wheel..."
-    uploadAsset ${VENV_PATH} bdist_wheel
+# Publish code
+echo "Publishing code on Github..."
+publish
 
-    # Publish source distribution only once
-    if [ ${TRAVIS_OS_NAME} == "*osx" ] && [${PYTHON_VERSION} == "2.7"]; then
-        echo "Uploading source distribution..."
-        uploadAsset ${VENV_PATH} sdist
-    fi
+# Build and publish Python wheel
+echo "Uploading python wheel..."
+uploadAsset ${VENV_PATH} bdist_wheel
+
+# Publish source distribution only once
+if [[ ${TRAVIS_OS_NAME} == "*osx" ]] && [[ ${PYTHON_VERSION} == "2.7" ]]; then
+    echo "Uploading source distribution..."
+    uploadAsset ${VENV_PATH} sdist
 fi

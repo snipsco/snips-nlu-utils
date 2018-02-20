@@ -9,21 +9,25 @@ env:
 matrix:
   include:
     - os: osx
+      osx_image: xcode8
       language: generic
       env:
         - TOXENV=py27
         - PYTHON_VERSION=2.7
     - os: osx
+      osx_image: xcode8
       language: generic
       env:
         - TOXENV=py34
         - PYTHON_VERSION=3.4
     - os: osx
+      osx_image: xcode8
       language: generic
       env:
         - TOXENV=py35
         - PYTHON_VERSION=3.5
     - os: osx
+      osx_image: xcode8
       language: generic
       env:
         - TOXENV=py36
@@ -94,4 +98,9 @@ install:
 
 script:
   - ./.travis/test.sh
-  - ./.travis/publish.sh
+
+deploy:
+  provider: script
+  script: bash ./.travis/publish.sh
+  on:
+    condition: [[ ${TRAVIS_EVENT_TYPE} == "pull_request" ]] && [[ ${TRAVIS_PULL_REQUEST_BRANCH} == hotfix* || ${TRAVIS_PULL_REQUEST_BRANCH} == release/* ]]
