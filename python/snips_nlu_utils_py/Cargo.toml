@@ -1,0 +1,12 @@
+[package]
+name = "snips-nlu-utils-py"
+version = "0.5.1"
+authors = ["Adrien Ball <adrien.ball@snips.ai>"]
+
+[lib]
+name = "_snips_nlu_utils_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+snips-nlu-utils = { path = "../.."}
+cpython = { version="0.1", default-features=false }

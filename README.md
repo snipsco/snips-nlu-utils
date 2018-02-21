@@ -1,5 +1,13 @@
-# NLU Utils
+# Snips NLU Utils
 
-[![Build Status](https://jenkins2.snips.ai/buildStatus/icon?job=SDK/nlu-utils/master)](https://jenkins2.snips.ai/job/SDK/job/nlu-utils/view/Branches/job/master)
+[![Build Status](https://travis-ci.org/snipsco/nlu-utils.svg?branch=develop)](https://travis-ci.org/snipsco/nlu-utils)
 
 Rust library for NLU utils with wrappers in other languages
+
+## Python wrapper
+
+Install the package with pip
+
+```bash
+pip install snips_nlu_utils
+```
