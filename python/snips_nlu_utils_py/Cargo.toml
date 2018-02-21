@@ -8,5 +8,5 @@ name = "_snips_nlu_utils_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-snips-nlu-utils = { path = "../.."}
+snips-nlu-utils = { git = "https://github.com/snipsco/snips-nlu-utils", tag = "0.5.3" }
 cpython = { version="0.1", default-features=false }
