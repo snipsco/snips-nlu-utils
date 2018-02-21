@@ -24,8 +24,7 @@ parseRustVersion() {
 updateVersions() {
     local tagVersion=$1
     echo "Updating version..."
-    ./update_version.sh ${tagVersion} || \
-        die "Could not upload version"
+    ./update_version.sh ${tagVersion} || die "Could not upload version"
 }
 
 TAG_VERSION=$(parseRustVersion)
