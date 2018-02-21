@@ -1,6 +1,6 @@
 # Snips NLU Utils
 
-[![Build Status](https://travis-ci.org/snipsco/nlu-utils.svg?branch=develop)](https://travis-ci.org/snipsco/nlu-utils)
+[![Build Status](https://travis-ci.org/snipsco/snips-nlu-utils.svg?branch=master)](https://travis-ci.org/snipsco/snips-nlu-utils)
 
 Rust library for NLU utils with wrappers in other languages
 
