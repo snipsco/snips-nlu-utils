@@ -1,5 +1,5 @@
 [package]
-name = "nlu-utils"
+name = "snips-nlu-utils"
 version = "0.5.3"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
