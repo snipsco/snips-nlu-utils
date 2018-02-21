@@ -41,14 +41,6 @@ before_install: |
         curl -O https://bootstrap.pypa.io/get-pip.py
         python get-pip.py --user
         ;;
-      py34)
-        pyenv install 3.4.6
-        pyenv global 3.4.6
-        ;;
-      py35)
-        pyenv install 3.5.3
-        pyenv global 3.5.3
-        ;;
       py36)
         pyenv install 3.6.1
         pyenv global 3.6.1
