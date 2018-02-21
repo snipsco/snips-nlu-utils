@@ -21,17 +21,18 @@ macro_rules! language_enum {
     }
 }
 
-language_enum!([DE, EN, ES, FR, KO]);
+language_enum!([DE, EN, ES, FR, JA, KO]);
 
 impl FromStr for Language {
     type Err = String;
     fn from_str(it: &str) -> Result<Language, Self::Err> {
         match &*it.to_lowercase() {
-            "en" => Ok(Language::EN),
-            "fr" => Ok(Language::FR),
-            "es" => Ok(Language::ES),
-            "ko" => Ok(Language::KO),
             "de" => Ok(Language::DE),
+            "en" => Ok(Language::EN),
+            "es" => Ok(Language::ES),
+            "fr" => Ok(Language::FR),
+            "ja" => Ok(Language::JA),
+            "ko" => Ok(Language::KO),
             _ => Err(format!("Unknown language {}", it)),
         }
     }
@@ -40,11 +41,12 @@ impl FromStr for Language {
 impl ToString for Language {
     fn to_string(&self) -> String {
         match *self {
-            Language::EN => "en".to_string(),
-            Language::FR => "fr".to_string(),
-            Language::ES => "es".to_string(),
-            Language::KO => "ko".to_string(),
             Language::DE => "de".to_string(),
+            Language::EN => "en".to_string(),
+            Language::ES => "es".to_string(),
+            Language::FR => "fr".to_string(),
+            Language::JA => "ja".to_string(),
+            Language::KO => "ko".to_string(),
         }
     }
 }
