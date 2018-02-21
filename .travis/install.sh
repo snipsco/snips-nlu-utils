@@ -10,6 +10,4 @@ rustBuild () {
         die "Rust build failed"
 }
 
-updateVersions ${TAG_VERSION}
-
 rustBuild
