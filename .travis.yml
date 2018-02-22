@@ -47,7 +47,6 @@ before_install: |
         ;;
     esac
     pyenv rehash
-    python -m pip install --user virtualenv
 
     # A manual check that the correct version of Python is running.
     python --version
