@@ -4,11 +4,6 @@ Snips NLU Utils
 .. image:: https://travis-ci.org/snipsco/snips-nlu-utils.svg?branch=master
     :target: https://travis-ci.org/snipsco/snips-nlu-utils
 
-.. image:: https://img.shields.io/pypi/v/snips-nlu-utils.svg?branch=master
-    :target: https://pypi.python.org/pypi/snips-nlu-utils
-
-.. image:: https://img.shields.io/pypi/pyversions/snips-nlu-utils.svg?branch=master
-    :target: https://pypi.python.org/pypi/snips-nlu-utils
 
 Rust library for NLU utils with wrappers in other languages.
 

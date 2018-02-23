@@ -1,6 +1,16 @@
 Snips NLU utils Python wrapper
 ==============================
 
+.. image:: https://travis-ci.org/snipsco/snips-nlu-utils.svg?branch=master
+    :target: https://travis-ci.org/snipsco/snips-nlu-utils
+
+.. image:: https://img.shields.io/pypi/v/snips-nlu-utils.svg?branch=master
+    :target: https://pypi.python.org/pypi/snips-nlu-utils
+
+.. image:: https://img.shields.io/pypi/pyversions/snips-nlu-utils.svg?branch=master
+    :target: https://pypi.python.org/pypi/snips-nlu-utils
+
+
 This library is a wrapper of a Rust NLU utils library, which is used by Snips NLU
 
 Installation
