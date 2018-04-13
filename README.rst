@@ -7,9 +7,19 @@ Snips NLU Utils
 
 Rust library for NLU utils with wrappers in other languages.
 
+Installation
+------------
+
+Add it to your ``Cargo.toml``:
+
+.. code-block:: toml
+
+   [dependencies]
+   snips-nlu-utils = { git = "https://github.com/snipsco/snips-nlu-utils", branch = "master" }
+
+Add ``extern crate snips_nlu_utils`` to your crate root and you are good to go!
+
 Python wrapper
 --------------
 
-See the `README`_ of the python wrapper for installation instruction.
-
-.. _README: https://github.com/snipsco/snips-nlu-utils/blob/master/python/README.rst
+See the `README <python/README.rst>`_ of the python wrapper for installation instruction.
