@@ -12,3 +12,8 @@ pub fn remove_diacritics(py: Python, string: PyUnicode) -> PyResult<PyUnicode> {
     let string_without_diacritics = string_utils::remove_diacritics(string.to_string(py)?.borrow());
     return Ok(PyUnicode::new(py, &string_without_diacritics.to_string()));
 }
+
+pub fn get_shape(py: Python, string: PyUnicode) -> PyResult<PyUnicode> {
+    let shape = string_utils::get_shape(string.to_string(py)?.borrow());
+    return Ok(PyUnicode::new(py, &shape.to_string()))
+}
