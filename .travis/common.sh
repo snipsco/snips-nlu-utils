@@ -16,15 +16,3 @@ has() {
 	local item=$1; shift
 	echo " $@ " | grep -q " $(escape $item) "
 }
-
-parseRustVersion() {
-    grep -w Cargo.toml -e '^version = ".*' | sed -- 's/version = "//g' | sed -- 's/"//g'
-}
-
-updateVersions() {
-    local tagVersion=$1
-    echo "Updating version..."
-    ./update_version.sh ${tagVersion} || die "Could not upload version"
-}
-
-TAG_VERSION=$(parseRustVersion)
