@@ -103,6 +103,48 @@ fn remove_combination_marks(character: char) -> Option<char> {
     })
 }
 
+
+/// Get the shape of the string in one of the following format:
+///
+/// - "xxx" -> lowercase
+/// - "XXX" -> uppercase
+/// - "Xxx" -> title case
+/// - "xX" -> mixed case
+///
+/// # Examples
+///
+/// ```
+/// use snips_nlu_utils::string::get_shape;
+///
+/// assert_eq!("xxx", get_shape("hello"));
+/// assert_eq!("Xxx", get_shape("Hello"));
+/// assert_eq!("XXX", get_shape("HELLO"));
+/// assert_eq!("xX", get_shape("hEllo"));
+/// ```
+pub fn get_shape(string: &str) -> &'static str {
+    if string.chars().all(char::is_lowercase) {
+        "xxx"
+    } else if string.chars().all(char::is_uppercase) {
+        "XXX"
+    } else if is_title_case(string) {
+        "Xxx"
+    } else {
+        "xX"
+    }
+}
+
+fn is_title_case(string: &str) -> bool {
+    let mut first = true;
+    for c in string.chars() {
+        match (first, c.is_uppercase()) {
+            (true, true) => first = false,
+            (false, false) => continue,
+            _ => return false,
+        }
+    }
+    !first
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -160,5 +202,14 @@ mod tests {
     #[test]
     fn normalize_works() {
         assert_eq!("heloa".to_string(), normalize("  HelöÀ "));
+    }
+
+    #[test]
+    fn shape_works() {
+        assert_eq!("xxx", get_shape("hello"));
+        assert_eq!("xxx", get_shape("hëllo"));
+        assert_eq!("Xxx", get_shape("Hello"));
+        assert_eq!("XXX", get_shape("HELLO"));
+        assert_eq!("xX", get_shape("hEllo"));
     }
 }
