@@ -5,7 +5,7 @@ Snips NLU Utils
     :target: https://travis-ci.org/snipsco/snips-nlu-utils
 
 .. image:: https://ci.appveyor.com/api/projects/status/github/snipsco/snips-nlu-utils?branch=develop&svg=true
-	:target: https://ci.appveyor.com/project/adrienball/snips-nlu-utils
+	:target: https://ci.appveyor.com/project/snipsco/snips-nlu-utils
 
 Rust library for NLU utils with wrappers in other languages.
 
