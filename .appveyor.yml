@@ -2,12 +2,8 @@ environment:
   matrix:
   - PYTHON: "C:\\Python27-x64"
     TARGET: x86_64-pc-windows-msvc
-  - PYTHON: "C:\\Python27-x64"
-    TARGET: x86_64-pc-windows-gnu
   - PYTHON: "C:\\Python36-x64"
     TARGET: x86_64-pc-windows-msvc
-  - PYTHON: "C:\\Python36-x64"
-    TARGET: x86_64-pc-windows-gnu
 
 branches:
   only:
@@ -20,13 +16,20 @@ install:
   - if defined MSYS2_BITS set PATH=%PATH%;C:\msys64\mingw%MSYS2_BITS%\bin
   - rustc -V
   - cargo -V
+  - "%PYTHON%\\python.exe -m pip install -r python/requirements.txt"
 
 build: false
 
 test_script:
-  - cargo build --verbose
   - cargo test --verbose
   - cd python
-  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - "%PYTHON%\\python.exe -m pip install -e . --verbose"
   - "%PYTHON%\\python.exe -m unittest discover"
+
+after_test:
+  - ECHO "BUILDING WHEELS..."
+  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+
+artifacts:
+  - path: python\dist\*
+    name: pypiartifacts
