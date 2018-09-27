@@ -21,7 +21,7 @@ macro_rules! language_enum {
     }
 }
 
-language_enum!([DE, EN, ES, FR, JA, KO]);
+language_enum!([DE, EN, ES, FR, IT, JA, KO]);
 
 impl FromStr for Language {
     type Err = String;
@@ -31,6 +31,7 @@ impl FromStr for Language {
             "en" => Ok(Language::EN),
             "es" => Ok(Language::ES),
             "fr" => Ok(Language::FR),
+            "it" => Ok(Language::IT),
             "ja" => Ok(Language::JA),
             "ko" => Ok(Language::KO),
             _ => Err(format!("Unknown language {}", it)),
@@ -45,6 +46,7 @@ impl ToString for Language {
             Language::EN => "en".to_string(),
             Language::ES => "es".to_string(),
             Language::FR => "fr".to_string(),
+            Language::IT => "it".to_string(),
             Language::JA => "ja".to_string(),
             Language::KO => "ko".to_string(),
         }
