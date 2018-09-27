@@ -1,6 +1,6 @@
 [package]
 name = "snips-nlu-utils-py"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 
 [lib]
@@ -8,5 +8,5 @@ name = "_snips_nlu_utils_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-snips-nlu-utils = { git = "https://github.com/snipsco/snips-nlu-utils", tag = "0.6.1" }
+snips-nlu-utils = { git = "https://github.com/snipsco/snips-nlu-utils", tag = "0.7.0" }
 cpython = { version="0.1", default-features=false }
