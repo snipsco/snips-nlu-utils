@@ -9,4 +9,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 snips-nlu-utils = { path = "../.." }
-cpython = { version="0.2.1", default-features=false }
+cpython = { version="0.2.1", default-features = false }
