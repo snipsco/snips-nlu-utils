@@ -1,12 +1,13 @@
 use std::cmp::min;
 use std::ops::Range;
+
 use itertools::Itertools;
-
-use language::Language;
+use lazy_static::lazy_static;
 use regex::{Regex, RegexBuilder};
-use range::ranges_overlap;
-use string::{convert_to_char_range, normalize};
 
+use crate::language::Language;
+use crate::range::ranges_overlap;
+use crate::string::{convert_to_char_range, normalize};
 
 pub type Ngrams = (String, Vec<usize>);
 
