@@ -2,11 +2,11 @@
 name = "snips-nlu-utils"
 version = "0.8.0-SNAPSHOT"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
+edition = "2018"
 
 [dependencies]
-error-chain = { version = "0.11", default-features = false }
-itertools = "0.7"
-lazy_static = "0.2"
+itertools = "0.8"
+lazy_static = "1.2"
 libc = "0.2"
-regex = "0.2"
+regex = "1.1"
 unicode-normalization = "0.1.5"
