@@ -12,6 +12,12 @@ matrix:
       env:
         - TOXENV=py36
         - PYTHON_TESTS=true
+    - os: osx
+      osx_image: xcode8
+      language: generic
+      env:
+      - TOXENV=py37
+      - PYTHON_TESTS=true
     - os: linux
       language: python
       python: 2.7
@@ -24,6 +30,12 @@ matrix:
       env:
         - TOXENV=py36
         - PYTHON_TESTS=true
+    - os: linux
+      language: python
+      python: 3.7
+      env:
+      - TOXENV=py37
+      - PYTHON_TESTS=true
     - os: linux
       language: rust
       rust: stable
