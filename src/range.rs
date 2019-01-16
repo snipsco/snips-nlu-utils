@@ -1,6 +1,5 @@
 use std::ops;
 
-
 pub fn ranges_overlap(r1: &ops::Range<usize>, r2: &ops::Range<usize>) -> bool {
     r1.start < r2.end && r1.end > r2.start
 }
