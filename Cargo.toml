@@ -5,7 +5,6 @@ authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 edition = "2018"
 
 [lib]
-name = "snips_nlu_parser_utils"
 crate-type = ["cdylib"]
 
 [dependencies]
