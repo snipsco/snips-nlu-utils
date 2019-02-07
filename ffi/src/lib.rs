@@ -77,3 +77,9 @@ pub unsafe extern "C" fn trie_map_len(
 
     wrap!(logic())
 }
+
+#[no_mangle]
+/// drop trie map
+pub unsafe extern "C" fn trie_map_drop(map_ptr: *mut StringTrieMap) -> SNIPS_RESULT {
+    wrap!(StringTrieMap::from_raw_pointer(map_ptr))
+}
