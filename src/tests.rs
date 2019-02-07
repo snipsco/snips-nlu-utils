@@ -1,4 +1,5 @@
 use crate::trie::Trie;
+use crate::StringTrieMap;
 
 trait ToVal {
     fn to_val(&self) -> Vec<i64>;
@@ -16,7 +17,6 @@ impl ToVal for &str {
         s.bytes().map(|x| x as i64).collect::<Vec<i64>>()
     }
 }
-
 
 const TEST_DATA: [(&'static str, i32); 7] = [
     ("abcdefgh", 19),
@@ -45,7 +45,6 @@ fn get_nonexistant() {
     assert!(trie.get("").is_none());
 }
 
-
 #[test]
 fn unicode() {
     let mut trie = Trie::new();
@@ -60,7 +59,6 @@ fn empty_key() {
     let mut trie = dummy_trie();
     trie.insert("", vec![1]);
     assert_eq!(*trie.get("").unwrap(), vec![1]);
-    //assert_eq!(trie.remove(""), Some(vec![1]));
 }
 
 #[test]
@@ -87,18 +85,17 @@ fn insert_replace() {
 #[test]
 fn insert_similar() {
     let mut trie = Trie::new();
-    trie.insert("a", vec![1,4]);
-    trie.insert("p", vec![1,3]);
-    assert_eq!(trie.get("a"), Some(&vec![1,4]));
-    assert_eq!(trie.get("p"), Some(&vec![1,3]));
-    trie.insert("a", vec![1,5]);
-    assert_eq!(trie.get("a"), Some(&vec![1,5]));
+    trie.insert("a", vec![1, 4]);
+    trie.insert("p", vec![1, 3]);
+    assert_eq!(trie.get("a"), Some(&vec![1, 4]));
+    assert_eq!(trie.get("p"), Some(&vec![1, 3]));
+    trie.insert("a", vec![1, 5]);
+    assert_eq!(trie.get("a"), Some(&vec![1, 5]));
     assert_eq!(trie.len(), 2);
     trie.remove("a");
     assert_eq!(trie.len(), 1);
     assert_eq!(trie.get("a"), None);
 }
-
 
 #[test]
 fn remove() {
@@ -139,7 +136,6 @@ fn remove_plus_insertion() {
     assert_eq!(trie.get("HELLO"), Some(&vec![88]));
 }
 
-
 #[test]
 fn remove_non_existent() {
     let mut trie = Trie::new();
@@ -160,18 +156,6 @@ fn remove_non_existent() {
     assert_eq!(trie.len(), 2);
 }
 
-
-
-//#[test]
-//fn iter() {
-//    type Set = HashSet<(&'static str, u32)>;
-//    let trie = dummy_trie();
-//    let expected = TEST_DATA.iter().map(|&x| x).collect::<Set>();
-//    let observed = trie.iter().map(|(&k, &v)| (k, v)).collect::<Set>();
-//    assert_eq!(expected, observed);
-//}
-
-
 #[test]
 fn get_prefix_bug() {
     let mut trie = Trie::new();
@@ -179,7 +163,6 @@ fn get_prefix_bug() {
     trie.insert("abde", vec![6]);
     assert!(trie.get("abc").is_none());
 }
-
 
 #[test]
 fn root_replace_bug() {
@@ -195,37 +178,12 @@ fn root_replace_bug() {
     assert_eq!(trie.len(), 0);
 }
 
-
-
-//#[test]
-//fn int_keys() {
-//    let mut trie = Trie::new();
-//    trie.insert(0x00ffu64, "asdf".to_val());
-//    trie.insert(0xdeadbeefu64, "asdf".to_val());
-//    assert!(trie.check_integrity());
-//}
-
-//#[test]
-//fn from_iter() {
-//    let trie: Trie<&str, u32> = Trie::from_iter(vec![("test", 10), ("hello", 12)]);
-//    assert_eq!(*trie.get(&"test").unwrap(), 10);
-//    assert_eq!(*trie.get(&"hello").unwrap(), 12);
-//    assert_eq!(trie.len(), 2);
-//}
-
 #[test]
 fn test_get_borrow() {
     let mut trie = Trie::new();
     trie.insert("/boot".to_string(), "dir".to_val());
     assert_eq!(*trie.get("/boot").unwrap(), "dir".to_val());
 }
-
-//#[test]
-//fn test_get_mut_borrow() {
-//    let mut trie = Trie::new();
-//    trie.insert("/boot".to_string(), "dir".to_val());
-//    assert_eq!(*trie.get_mut("/boot").unwrap(), "dir".to_val());
-//}
 
 #[test]
 fn test_remove_borrow() {
@@ -234,3 +192,16 @@ fn test_remove_borrow() {
     assert_eq!(trie.remove("/boot").unwrap(), "dir".to_val());
 }
 
+#[test]
+fn test_trie_map() {
+    let mut map = StringTrieMap::new();
+    map.insert("/boot", "dir");
+    assert_eq!(map.get("/boot"), Some("dir".to_string()));
+    map.insert("alpha", "beta");
+    assert_eq!(map.get("alpha"), Some("beta".to_string()));
+    assert_eq!(map.len(), 2);
+    map.remove("alpha");
+    assert_eq!(map.get("alpha"), None);
+    assert_eq!(map.len(), 1);
+    assert_eq!(map.get("/boot"), Some("dir".to_string()));
+}

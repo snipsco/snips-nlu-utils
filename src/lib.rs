@@ -4,10 +4,6 @@ pub mod string;
 pub mod token;
 
 #[deny(missing_docs)]
-/// FFI interface module
-pub mod ffi;
-
-#[deny(missing_docs)]
 /// A string => int symbol table
 pub mod symboltable;
 
@@ -16,6 +12,12 @@ pub mod symboltable;
 pub mod trie;
 
 pub use symboltable::SymbolTable;
+pub use trie::Trie;
 
 #[cfg(test)]
 mod tests;
+
+#[deny(missing_docs)]
+/// a string => string map
+pub mod string_trie_map;
+pub use string_trie_map::StringTrieMap;
