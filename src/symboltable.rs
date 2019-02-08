@@ -14,7 +14,6 @@ const DEFAULT_KEY: u64 = 0xcbf2_9ce4_8422_2325;
 /// A string to i64 symbol table
 pub struct SymbolTable {
     table: HashMap<i64, String>,
-    count: i32,
 }
 
 impl SymbolTable {
@@ -22,7 +21,6 @@ impl SymbolTable {
     pub fn new() -> SymbolTable {
         SymbolTable {
             table: HashMap::new(),
-            count: 0,
         }
     }
 
@@ -36,7 +34,6 @@ impl SymbolTable {
         let hash = hasher.finish();
 
         self.table.insert(hash as i64, symbol);
-        self.count += 1;
         hash as i64
     }
 
@@ -78,19 +75,19 @@ impl SymbolTable {
     }
 
     /// length of the symbol table
-    pub fn len(&self) -> i32 {
-        self.count
+    pub fn len(&self) -> usize {
+        self.table.len()
     }
 
     /// check if symbol table is empty
     pub fn is_empty(&self) -> bool {
-        self.count == 0
+        self.len() == 0
     }
 }
 
 impl PartialEq for SymbolTable {
     fn eq(&self, other: &SymbolTable) -> bool {
-        self.count == other.count && self.table == other.table
+        self.table == other.table
     }
 }
 

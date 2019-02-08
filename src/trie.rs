@@ -44,7 +44,7 @@ pub struct Key {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 struct Node {
     key: Key,
-    val: Option<Vec<i64>>,
+    val: Option<V>,
     children: [Option<Box<Node>>; BRANCH_FACTOR],
     child_count: i32,
 }
@@ -70,8 +70,7 @@ impl Key {
     }
 
     /// split key at a specified index
-    pub fn split(&mut self, idx: Option<usize>) -> Key {
-        let idx = idx.unwrap_or(1);
+    pub fn split(&mut self, idx: usize) -> Key {
         debug_assert!(self.data.len() > idx);
         Key {
             data: self.data.split_off(idx),
@@ -122,8 +121,8 @@ impl Key {
     }
 }
 
-impl From<Vec<i64>> for Key {
-    fn from(v: Vec<i64>) -> Key {
+impl From<V> for Key {
+    fn from(v: V) -> Key {
         let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
         for i in v {
             hasher.write_i64(i);
@@ -185,7 +184,7 @@ impl From<&str> for Key {
 }
 
 impl Node {
-    pub fn with_keyval(k: Key, v: Option<Vec<i64>>) -> Node {
+    pub fn with_keyval(k: Key, v: Option<V>) -> Node {
         Node {
             key: k,
             val: v,
@@ -200,7 +199,7 @@ impl Node {
         if let Some(ref child) = self.children[bkt] {
             match child.key.match_key(&k) {
                 KeyMatch::Partial(idx) => {
-                    return child.get(k.split(Some(idx)));
+                    return child.get(k.split(idx));
                 }
                 KeyMatch::Full => match child.val {
                     Some(ref val) => return Some(val),
@@ -217,7 +216,7 @@ impl Node {
         }
     }
 
-    pub fn insert(&mut self, mut k: Key, v: Vec<i64>) -> Option<V> {
+    pub fn insert(&mut self, mut k: Key, v: V) -> Option<V> {
         debug_assert!(!k.is_empty());
         let bkt = k.get_bucket();
         if let Some(ref mut child) = self.children[bkt] {
@@ -226,7 +225,7 @@ impl Node {
                     if child.val.is_some() {
                         child.split(idx);
                     }
-                    return child.insert(k.split(Some(idx)), v);
+                    return child.insert(k.split(idx), v);
                 }
                 KeyMatch::Full => {
                     return child.replace_value(v);
@@ -254,7 +253,7 @@ impl Node {
                     res
                 }
                 KeyMatch::Partial(idx) => {
-                    return child.remove(k.split(Some(idx)));
+                    return child.remove(k.split(idx));
                 }
                 KeyMatch::NoMatch => return None,
             }
@@ -287,7 +286,7 @@ impl Node {
 
     pub fn split(&mut self, idx: usize) {
         debug_assert!(self.val.is_some());
-        let suffix = self.key.split(Some(idx));
+        let suffix = self.key.split(idx);
         let val = self.val.take();
         self.insert(suffix, val.unwrap());
     }
@@ -305,7 +304,7 @@ impl Node {
             if let Some(ref child) = self.children[i] {
                 match child.check_integrity() {
                     false => return false,
-                    true => {},
+                    true => {}
                 }
             }
         }
@@ -341,7 +340,7 @@ impl Trie {
     }
 
     /// insert key-value into the trie
-    pub fn insert<K: Into<Key>, J: Into<Vec<i64>>>(&mut self, key: K, val: J) -> Option<Vec<i64>> {
+    pub fn insert<K: Into<Key>, J: Into<V>>(&mut self, key: K, val: J) -> Option<V> {
         let key = key.into();
         let val = val.into();
         match self.root.insert(key, val) {
