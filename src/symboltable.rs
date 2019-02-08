@@ -28,8 +28,7 @@ impl SymbolTable {
     pub fn add_symbol<S: Into<String>>(&mut self, symbol: S) -> i64 {
         let symbol = symbol.into();
         let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        // can we avoid this clone?
-        hasher.write(&symbol.clone().into_bytes());
+        hasher.write(symbol.as_bytes());
 
         let hash = hasher.finish();
 

@@ -204,4 +204,6 @@ fn test_trie_map() {
     assert_eq!(map.get("alpha"), None);
     assert_eq!(map.len(), 1);
     assert_eq!(map.get("/boot"), Some("dir".to_string()));
+    map.insert("gamma  rho", "sigma");
+    assert_eq!(map.get("gamma  rho"), Some("sigma".to_string()));
 }
