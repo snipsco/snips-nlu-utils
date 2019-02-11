@@ -35,30 +35,20 @@ impl StringTrieMap {
     }
 
     /// get the value corresponding to the given key
-    pub fn get<S: Into<String>>(&self, k: S) -> Option<String> {
-        let mut key = vec![];
-        for frag in k.into().split_whitespace() {
-            if let Some(res) = self.table.get_key(frag) {
-                key.push(res);
-            } else {
-                return None;
-            }
-        }
-
-        if let Some(trie_val) = self.trie.get(key) {
-            let mut res = vec![];
-            for frag in trie_val {
-                if let Some(val) = self.table.get_symbol(*frag) {
-                    // how to avoid this clone??
-                    res.push(val.clone());
-                } else {
-                    return None;
+    pub fn get<S: Into<String>>(&self, s: S) -> Option<String> {
+        self.string_to_symbols(s).and_then(|key| {
+            self.trie.get(key).and_then(|trie_val| {
+                let mut res = vec![];
+                for frag in trie_val {
+                    if let Some(val) = self.table.get_symbol(*frag) {
+                        res.push(val.clone());
+                    } else {
+                        return None;
+                    }
                 }
-            }
-            Some(res.join("  "))
-        } else {
-            None
-        }
+                Some(res.join("  "))
+            })
+        })
     }
 
     /// remove key from trie
@@ -67,16 +57,13 @@ impl StringTrieMap {
     /// leaving unused symbols. If more expensive to track
     /// and remove unused symbols therefore the ideal usecase
     /// you avoid removing keys.
-    pub fn remove<S: Into<String>>(&mut self, k: S) {
-        let mut key = vec![];
-        for frag in k.into().split_whitespace() {
-            if let Some(res) = self.table.get_key(frag) {
-                key.push(res);
-            } else {
-                return;
-            } 
-        }
-        self.trie.remove(key);
+    pub fn remove<S: Into<String>>(&mut self, s: S) -> Option<String> {
+        // create key from string
+        self.string_to_symbols(s)
+            .and_then(|key| match self.trie.remove(key) {
+                Some(val) => self.trie_val_to_string(val),
+                None => None,
+            })
     }
 
     /// dump the map to the filesystem
@@ -100,5 +87,29 @@ impl StringTrieMap {
     /// length of the key-value map
     pub fn len(&self) -> usize {
         self.trie.len()
+    }
+
+    fn trie_val_to_string(&self, val: Vec<i64>) -> Option<String> {
+        let mut res = vec![];
+        for frag in val {
+            if let Some(val) = self.table.get_symbol(frag) {
+                res.push(val.clone());
+            } else {
+                return None;
+            }
+        }
+        Some(res.join("  "))
+    }
+
+    fn string_to_symbols<S: Into<String>>(&self, s: S) -> Option<Vec<i64>> {
+        let mut syms = vec![];
+        for frag in s.into().split_whitespace() {
+            if let Some(res) = self.table.get_key(frag) {
+                syms.push(res);
+            } else {
+                return None;
+            }
+        }
+        Some(syms)
     }
 }
