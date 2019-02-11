@@ -2,7 +2,7 @@
 use failure::Fallible;
 use failure::ResultExt;
 use ffi_utils::*;
-use libc::size_t;
+use libc;
 use snips_nlu_utils::StringTrieMap;
 
 generate_error_handling!(ffi_get_last_error);
@@ -22,8 +22,8 @@ pub extern "C" fn trie_map_new(map_ptr: *mut *const StringTrieMap) -> SNIPS_RESU
 /// insert string key-value into the map
 pub unsafe extern "C" fn trie_map_insert(
     map_ptr: *mut StringTrieMap,
-    k: *const i8,
-    v: *const i8,
+    k: *const libc::c_char,
+    v: *const libc::c_char,
 ) -> SNIPS_RESULT {
     let logic = || -> Fallible<()> {
         let map = StringTrieMap::raw_borrow_mut(map_ptr)?;
@@ -38,7 +38,7 @@ pub unsafe extern "C" fn trie_map_insert(
 
 #[no_mangle]
 /// dump trie map to the file system
-pub extern "C" fn trie_map_dump(map_ptr: *mut StringTrieMap, path: *const i8) -> SNIPS_RESULT {
+pub extern "C" fn trie_map_dump(map_ptr: *mut StringTrieMap, path: *const libc::c_char) -> SNIPS_RESULT {
     let logic = || -> Fallible<()> {
         let map = unsafe { StringTrieMap::raw_borrow(map_ptr)? };
         map.dump(create_rust_string_from!(path))?;
@@ -52,7 +52,7 @@ pub extern "C" fn trie_map_dump(map_ptr: *mut StringTrieMap, path: *const i8) ->
 /// load trie map from the file system
 pub extern "C" fn trie_map_load(
     map_ptr: *mut *const StringTrieMap,
-    path: *const i8,
+    path: *const libc::c_char,
 ) -> SNIPS_RESULT {
     let logic = || -> Fallible<()> {
         let map = StringTrieMap::load(create_rust_string_from!(path))?;
@@ -67,7 +67,7 @@ pub extern "C" fn trie_map_load(
 /// length of the trie map
 pub unsafe extern "C" fn trie_map_len(
     symt_ptr: *mut StringTrieMap,
-    length: *mut size_t,
+    length: *mut libc::size_t,
 ) -> SNIPS_RESULT {
     let logic = || -> Fallible<()> {
         let map = StringTrieMap::raw_borrow(symt_ptr)?;
