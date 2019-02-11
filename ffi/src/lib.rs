@@ -36,9 +36,50 @@ pub unsafe extern "C" fn trie_map_insert(
     wrap!(logic())
 }
 
+/// get value corresponding to key from the map
+#[no_mangle]
+pub unsafe extern "C" fn trie_map_get(
+    map_ptr: *mut StringTrieMap,
+    k: *const libc::c_char,
+    v: *mut *const libc::c_char,
+) -> SNIPS_RESULT {
+    let logic = || -> Fallible<()> {
+        let map = StringTrieMap::raw_borrow(map_ptr)?;
+        let key = create_rust_string_from!(k);
+        if let Some(val) = map.get(key) {
+            *v = convert_to_c_string!(val);
+        }
+        Ok(())
+    };
+
+    wrap!(logic())
+}
+
+/// remove key from the map
+#[no_mangle]
+pub unsafe extern "C" fn trie_map_remove(
+    map_ptr: *mut StringTrieMap,
+    k: *const libc::c_char,
+    v: *mut *const libc::c_char,
+) -> SNIPS_RESULT {
+    let logic = || -> Fallible<()> {
+        let map = StringTrieMap::raw_borrow_mut(map_ptr)?;
+        let key = create_rust_string_from!(k);
+        if let Some(val) = map.remove(key) {
+            *v = convert_to_c_string!(val);
+        }
+        Ok(())
+    };
+
+    wrap!(logic())
+}
+
 #[no_mangle]
 /// dump trie map to the file system
-pub extern "C" fn trie_map_dump(map_ptr: *mut StringTrieMap, path: *const libc::c_char) -> SNIPS_RESULT {
+pub extern "C" fn trie_map_dump(
+    map_ptr: *mut StringTrieMap,
+    path: *const libc::c_char,
+) -> SNIPS_RESULT {
     let logic = || -> Fallible<()> {
         let map = unsafe { StringTrieMap::raw_borrow(map_ptr)? };
         map.dump(create_rust_string_from!(path))?;
