@@ -1,15 +1,12 @@
 use failure::Fallible;
-use fnv::FnvHasher;
 use rmp_serde as rmps;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::hash::Hasher;
 use std::io::{BufReader, Write};
 use std::mem;
 use std::path::Path;
 
 const BRANCH_FACTOR: usize = 16;
-const DEFAULT_KEY: u64 = 0xcbf2_9ce4_8422_2325;
 
 type V = Vec<i64>;
 
@@ -38,7 +35,7 @@ pub enum KeyMatch {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 /// trie key
 pub struct Key {
-    data: Vec<u8>,
+    data: V,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -61,9 +58,10 @@ impl Key {
     /// and index between 0 and 15
     pub fn get_bucket(&self) -> usize {
         debug_assert!(!self.is_empty());
-        let entry = match self.data.len() % 2 {
-            0 => self.data[0] >> 4,
-            _ => self.data[0] & 0x0F,
+        let frag = self.data[0] as u8;
+        let entry = match frag % 2 {
+            0 => frag >> 4,
+            _ => frag & 0x0F,
         };
 
         entry as usize
@@ -106,8 +104,6 @@ impl Key {
         } else {
             KeyMatch::Partial(min_len)
         }
-
-        //KeyMatch::Full
     }
 
     /// check if key is empty
@@ -118,68 +114,6 @@ impl Key {
     /// create an empty key: used to initialize the root node.
     pub fn empty() -> Key {
         Key { data: vec![] }
-    }
-}
-
-impl From<V> for Key {
-    fn from(v: V) -> Key {
-        let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        for i in v {
-            hasher.write_i64(i);
-        }
-        let hash = hasher.finish();
-
-        Key {
-            data: hash.to_be_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&[u8]> for Key {
-    fn from(v: &[u8]) -> Key {
-        let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        hasher.write(v);
-        let hash = hasher.finish();
-
-        Key {
-            data: hash.to_be_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&[i64]> for Key {
-    fn from(v: &[i64]) -> Key {
-        let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        for i in v {
-            hasher.write_i64(*i);
-        }
-        let hash = hasher.finish();
-
-        Key {
-            data: hash.to_be_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<String> for Key {
-    fn from(input: String) -> Key {
-        let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        hasher.write(input.as_bytes());
-        let hash = hasher.finish();
-        Key {
-            data: hash.to_be_bytes().to_vec(),
-        }
-    }
-}
-
-impl From<&str> for Key {
-    fn from(input: &str) -> Key {
-        let mut hasher = FnvHasher::with_key(DEFAULT_KEY);
-        hasher.write(input.as_bytes());
-        let hash = hasher.finish();
-        Key {
-            data: hash.to_be_bytes().to_vec(),
-        }
     }
 }
 
@@ -199,6 +133,9 @@ impl Node {
         if let Some(ref child) = self.children[bkt] {
             match child.key.match_key(&k) {
                 KeyMatch::Partial(idx) => {
+                    if k.len() < child.key.len() {
+                        return None;
+                    }
                     return child.get(k.split(idx));
                 }
                 KeyMatch::Full => match child.val {
@@ -222,8 +159,11 @@ impl Node {
         if let Some(ref mut child) = self.children[bkt] {
             match child.key.match_key(&k) {
                 KeyMatch::Partial(idx) => {
-                    if child.val.is_some() {
-                        child.split(idx);
+                    if k.len() < child.key.len() {
+                        if child.val.is_some() {
+                            child.split(idx);
+                        }
+                        return self.insert(k, v);
                     }
                     return child.insert(k.split(idx), v);
                 }
@@ -247,12 +187,19 @@ impl Node {
             match child.key.match_key(&k) {
                 KeyMatch::Full => {
                     let res = child.val.take();
-                    self.children[bkt] = None;
-                    self.child_count -= 1;
-                    self.prune();
+                    if child.child_count == 0 {
+                        self.children[bkt] = None;
+                        self.child_count -= 1;
+                    } else {
+                        child.prune();
+                    }
+                    //self.prune();
                     res
                 }
                 KeyMatch::Partial(idx) => {
+                    if k.len() < child.key.len() {
+                        return None;
+                    }
                     return child.remove(k.split(idx));
                 }
                 KeyMatch::NoMatch => return None,
@@ -278,6 +225,7 @@ impl Node {
             if let Some(ref mut child) = self.children[idx] {
                 self.key.merge(&mut child.key);
                 self.val = child.val.take();
+                self.child_count -= 1;
             }
 
             std::mem::replace(&mut self.children[idx], None);
@@ -286,18 +234,25 @@ impl Node {
 
     pub fn split(&mut self, idx: usize) {
         debug_assert!(self.val.is_some());
-        let suffix = self.key.split(idx);
+        // split key and grab the value
+        let key = self.key.split(idx);
         let val = self.val.take();
-        self.insert(suffix, val.unwrap());
+        // move the children
+        let children = std::mem::replace(&mut self.children, no_kids!());
+        let child_count = self.child_count;
+        self.child_count = 1;
+        let bkt = key.get_bucket();
+        self.children[bkt] = Some(Box::new(Node {
+            key,
+            val,
+            children,
+            child_count,
+        }));
     }
 
     fn check_integrity(&self) -> bool {
         // check if non-root nodes with single child have values
-        if !self.key.is_empty()
-            && self.key.len() != 8
-            && self.child_count == 1
-            && self.val.is_none()
-        {
+        if (self.child_count == 1 && self.val.is_none()) || self.key.is_empty() {
             return false;
         }
         for i in 0..BRANCH_FACTOR {
@@ -320,7 +275,10 @@ impl Node {
     fn replace_value(&mut self, v: V) -> Option<V> {
         match self.val {
             Some(ref mut val) => Some(mem::replace(val, v)),
-            _ => unreachable!(),
+            _ => {
+                self.val = Some(v);
+                None
+            }
         }
     }
 }
@@ -340,10 +298,8 @@ impl Trie {
     }
 
     /// insert key-value into the trie
-    pub fn insert<K: Into<Key>, J: Into<V>>(&mut self, key: K, val: J) -> Option<V> {
-        let key = key.into();
-        let val = val.into();
-        match self.root.insert(key, val) {
+    pub fn insert(&mut self, key: V, val: V) -> Option<V> {
+        match self.root.insert(Key { data: key }, val) {
             Some(res) => Some(res),
             None => {
                 self.length += 1;
@@ -353,8 +309,11 @@ impl Trie {
     }
 
     /// remove key from the trie
-    pub fn remove<K: Into<Key>>(&mut self, k: K) -> Option<V> {
-        let k = k.into();
+    pub fn remove(&mut self, k: V) -> Option<V> {
+        if k.is_empty() {
+            return None;
+        }
+        let k = Key { data: k };
         match self.root.remove(k) {
             Some(v) => {
                 self.length -= 1;
@@ -365,8 +324,12 @@ impl Trie {
     }
 
     /// retrieve the value matching the given key
-    pub fn get<K: Into<Key>>(&self, key: K) -> Option<&V> {
-        self.root.get(key.into())
+    pub fn get(&self, key: V) -> Option<&V> {
+        if key.is_empty() {
+            None
+        } else {
+            self.root.get(Key { data: key })
+        }
     }
 
     /// check if trie is empty
@@ -381,7 +344,16 @@ impl Trie {
 
     /// check if the trie obeys expected invariants / validity checks
     pub fn check_integrity(&self) -> bool {
-        self.root.check_integrity()
+        for i in 0..BRANCH_FACTOR {
+            if let Some(ref child) = self.root.children[i] {
+                match child.check_integrity() {
+                    false => return false,
+                    true => {}
+                }
+            }
+        }
+
+        true
     }
 
     /// serialize trie onto a file
