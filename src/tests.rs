@@ -1,4 +1,4 @@
-use crate::trie::Trie;
+use crate::trie::{Key, Trie};
 use crate::StringTrieMap;
 use tempfile::tempdir;
 
@@ -37,6 +37,13 @@ fn dummy_trie() -> Trie {
     assert!(t.check_integrity());
 
     t
+}
+
+#[test]
+fn key_bucket_invariant() {
+    for i in u8::min_value()..=u8::max_value() {
+        assert!(Key::new(vec![i as i64]).get_bucket() <= 15);
+    }
 }
 
 #[test]

@@ -54,6 +54,10 @@ pub struct Trie {
 }
 
 impl Key {
+    /// create new key
+    pub fn new(data: V) -> Key {
+        Key{data}
+    }
     /// get the internal bucket to which this key belongs, usually
     /// and index between 0 and 15
     pub fn get_bucket(&self) -> usize {
