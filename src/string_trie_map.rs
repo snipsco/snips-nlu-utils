@@ -3,10 +3,10 @@ use failure::{bail, Fallible};
 use std::fs::DirBuilder;
 use std::path::Path;
 
-#[derive(Debug)]
 /// a string-to-string key-value mapping
 /// build using the Trie and SymbolTable
 /// data structures.
+#[derive(Debug, Default)]
 pub struct StringTrieMap {
     trie: Trie,
     table: SymbolTable,
@@ -109,6 +109,11 @@ impl StringTrieMap {
     /// length of the key-value map
     pub fn len(&self) -> usize {
         self.trie.len()
+    }
+
+    /// check is map is empty
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     fn trie_val_to_string(&self, val: Vec<i64>) -> Option<String> {

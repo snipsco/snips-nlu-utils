@@ -257,9 +257,8 @@ impl Node {
         }
         for i in 0..BRANCH_FACTOR {
             if let Some(ref child) = self.children[i] {
-                match child.check_integrity() {
-                    false => return false,
-                    true => {}
+                if !child.check_integrity() {
+                    return false;
                 }
             }
         }
@@ -346,9 +345,8 @@ impl Trie {
     pub fn check_integrity(&self) -> bool {
         for i in 0..BRANCH_FACTOR {
             if let Some(ref child) = self.root.children[i] {
-                match child.check_integrity() {
-                    false => return false,
-                    true => {}
+                if !child.check_integrity() {
+                    return false;
                 }
             }
         }
