@@ -4,6 +4,14 @@ version = "0.8.0"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 edition = "2018"
 
+[workspace]
+members = [
+    ".",
+    "ffi",
+    "ffi/ffi-macros",
+    "python/ffi"
+]
+
 [dependencies]
 itertools = "0.8"
 lazy_static = "1.2"
