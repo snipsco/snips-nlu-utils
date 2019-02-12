@@ -69,8 +69,8 @@ impl StringTrieMap {
     }
 
     /// dump the map to the filesystem
-    pub fn dump(&self, path: String) -> Fallible<()> {
-        let path = Path::new(&path);
+    pub fn dump<P: AsRef<Path>>(&self, path: P) -> Fallible<()> {
+        let path = path.as_ref();
         if !path.is_absolute() {
             bail!("string trie map: path must be absolute!")
         } else if path.exists() && !path.is_dir() {
@@ -93,8 +93,8 @@ impl StringTrieMap {
     }
 
     /// deserialize a map from the filesystem
-    pub fn load(path: String) -> Fallible<(StringTrieMap)> {
-        let path = Path::new(&path);
+    pub fn load<P: AsRef<Path>>(path: P) -> Fallible<(StringTrieMap)> {
+        let path = path.as_ref();
         if !path.is_dir() {
             bail!("string trie map: path should exists and be a directory!")
         } else {
@@ -135,3 +135,11 @@ impl StringTrieMap {
         Some(syms)
     }
 }
+
+impl PartialEq for StringTrieMap {
+    fn eq(&self, other: &StringTrieMap) -> bool {
+        self.trie == other.trie && self.table == other.table
+    }
+}
+
+impl Eq for StringTrieMap {}

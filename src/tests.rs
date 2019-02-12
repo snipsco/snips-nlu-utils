@@ -1,5 +1,6 @@
 use crate::trie::Trie;
 use crate::StringTrieMap;
+use tempfile::tempdir;
 
 trait ToVal {
     fn to_val(&self) -> Vec<i64>;
@@ -198,4 +199,13 @@ fn test_trie_map() {
     assert_eq!(map.get("gamma  rho"), Some("sigma".to_string()));
     map.insert("gamma", "sigma  sigma");
     assert_eq!(map.get("gamma"), Some("sigma  sigma".to_string()));
+
+    // test dump and load
+    let dir = tempdir().unwrap();
+    map.dump(dir.path()).unwrap();
+
+    let loaded_map = StringTrieMap::load(dir.path()).unwrap();
+    assert_eq!(map, loaded_map);
+
+    dir.close().unwrap();
 }

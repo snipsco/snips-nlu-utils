@@ -13,3 +13,6 @@ serde = { version = "1", features = ["derive"] }
 failure = "0.1"
 fnv = "1"
 rmp-serde = "0.13"
+
+[dev-dependencies]
+tempfile = "3.0"
