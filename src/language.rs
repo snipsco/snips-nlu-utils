@@ -1,4 +1,6 @@
 use std::str::FromStr;
+use failure;
+use failure::format_err;
 
 const PUNCTUATION: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const SPACE: &str = " ";
@@ -24,7 +26,7 @@ macro_rules! language_enum {
 language_enum!([DE, EN, ES, FR, IT, JA, KO]);
 
 impl FromStr for Language {
-    type Err = String;
+    type Err = failure::Error;
     fn from_str(it: &str) -> Result<Language, Self::Err> {
         match &*it.to_lowercase() {
             "de" => Ok(Language::DE),
@@ -34,7 +36,7 @@ impl FromStr for Language {
             "it" => Ok(Language::IT),
             "ja" => Ok(Language::JA),
             "ko" => Ok(Language::KO),
-            _ => Err(format!("Unknown language {}", it)),
+            _ => Err(format_err!("Unknown language {}", it)),
         }
     }
 }

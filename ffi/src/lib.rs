@@ -4,8 +4,11 @@ use failure::ResultExt;
 use ffi_utils::*;
 use libc;
 use snips_nlu_utils::StringTrieMap;
+use snips_nlu_utils_ffi_macros::export_nlu_utils_c_symbols;
 
 generate_error_handling!(ffi_get_last_error);
+
+export_nlu_utils_c_symbols!();
 
 #[no_mangle]
 /// create a new string trie map
