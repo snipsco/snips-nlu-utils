@@ -1,5 +1,7 @@
 use crate::{SymbolTable, Trie};
-use failure::Fallible;
+use failure::{bail, Fallible};
+use std::fs::DirBuilder;
+use std::path::Path;
 
 #[derive(Debug)]
 /// a string-to-string key-value mapping
@@ -68,8 +70,23 @@ impl StringTrieMap {
 
     /// dump the map to the filesystem
     pub fn dump(&self, path: String) -> Fallible<()> {
-        let table_path = format!("{}.table", path);
-        let trie_path = format!("{}.trie", path);
+        let path = Path::new(&path);
+        if !path.is_absolute() {
+            bail!("string trie map: path must be absolute!")
+        } else if path.exists() && !path.is_dir() {
+            bail!("string trie map: path must be a directory!")
+        } else if path.exists() {
+            self._dump(path)
+        } else {
+            DirBuilder::new().recursive(true).create(path)?;
+            self._dump(path)
+        }
+    }
+
+    fn _dump<P: AsRef<Path>>(&self, path: P) -> Fallible<()> {
+        let path = path.as_ref();
+        let table_path = path.join("table");
+        let trie_path = path.join("trie");
         self.table.dump(table_path)?;
         self.trie.dump(trie_path)?;
         Ok(())
@@ -77,11 +94,16 @@ impl StringTrieMap {
 
     /// deserialize a map from the filesystem
     pub fn load(path: String) -> Fallible<(StringTrieMap)> {
-        let table_path = format!("{}.table", path);
-        let trie_path = format!("{}.trie", path);
-        let table = SymbolTable::load(table_path)?;
-        let trie = Trie::load(trie_path)?;
-        Ok(Self { trie, table })
+        let path = Path::new(&path);
+        if !path.is_dir() {
+            bail!("string trie map: path should exists and be a directory!")
+        } else {
+            let table_path = path.join("table");
+            let trie_path = path.join("trie");
+            let table = SymbolTable::load(table_path)?;
+            let trie = Trie::load(trie_path)?;
+            Ok(Self { trie, table })
+        }
     }
 
     /// length of the key-value map
