@@ -1,11 +1,15 @@
-#[deny(missing_docs)]
-use failure::Fallible;
-use failure::ResultExt;
+mod destroy;
+mod string;
+mod token;
+mod types;
+
+use failure::{Fallible, ResultExt};
 use ffi_utils::*;
-use libc;
 use snips_nlu_utils::StringTrieMap;
 
-generate_error_handling!(ffi_get_last_error);
+type Result<T> = ::std::result::Result<T, ::failure::Error>;
+
+generate_error_handling!(snips_nlu_utils_get_last_error);
 
 #[no_mangle]
 /// create a new string trie map
@@ -123,4 +127,65 @@ pub unsafe extern "C" fn trie_map_len(
 /// drop trie map
 pub unsafe extern "C" fn trie_map_drop(map_ptr: *mut StringTrieMap) -> SNIPS_RESULT {
     wrap!(StringTrieMap::from_raw_pointer(map_ptr))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_destroy_string(ptr: *mut libc::c_char) -> SNIPS_RESULT {
+    wrap!(destroy::destroy_string_c(ptr))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_destroy_string_array(
+    ptr: *mut ::ffi_utils::CStringArray,
+) -> SNIPS_RESULT {
+    wrap!(destroy::destroy_string_array_c(ptr))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_destroy_token_array(
+    ptr: *mut types::CTokenArray,
+) -> SNIPS_RESULT {
+    wrap!(destroy::destroy_token_array_c(ptr))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_remove_diacritics(
+    input: *const ::libc::c_char,
+    result: *mut *const ::libc::c_char,
+) -> SNIPS_RESULT {
+    wrap!(string::remove_diacritics_c(input, result))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_normalize(
+    input: *const ::libc::c_char,
+    result: *mut *const ::libc::c_char,
+) -> SNIPS_RESULT {
+    wrap!(string::normalize_c(input, result))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_get_shape(
+    input: *const ::libc::c_char,
+    result: *mut *const ::libc::c_char,
+) -> SNIPS_RESULT {
+    wrap!(string::get_shape_c(input, result))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_tokenize(
+    input: *const ::libc::c_char,
+    language: *const ::libc::c_char,
+    result: *mut *const types::CTokenArray,
+) -> SNIPS_RESULT {
+    wrap!(token::tokenize_c(input, language, result))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_tokenize_light(
+    input: *const ::libc::c_char,
+    language: *const ::libc::c_char,
+    result: *mut *const ::ffi_utils::CStringArray,
+) -> SNIPS_RESULT {
+    wrap!(token::tokenize_light_c(input, language, result))
 }

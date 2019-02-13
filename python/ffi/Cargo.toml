@@ -1,0 +1,15 @@
+[package]
+name = "snips-nlu-utils-python-ffi"
+version = "0.1.0"
+authors = ["Adrien Ball <adrien.ball@snips.ai>"]
+edition = "2018"
+
+[lib]
+name = "snips_nlu_utils_python_ffi"
+crate-type = ["cdylib"]
+
+[dependencies]
+failure = "0.1"
+libc = "0.2"
+ffi-utils = { git = "https://github.com/snipsco/snips-utils-rs", rev = "291ce1d" }
+snips-nlu-utils = { path = "../.." }
