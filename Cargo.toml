@@ -6,9 +6,6 @@ edition = "2018"
 
 [workspace]
 members = [
-    ".",
-    "ffi",
-    "ffi/ffi-macros",
     "python/ffi"
 ]
 

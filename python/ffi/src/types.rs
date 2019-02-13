@@ -1,5 +1,5 @@
 use failure::{Error, ResultExt};
-use ffi_utils::{CReprOf, convert_to_c_string, take_back_c_string, RawPointerConverter};
+use ffi_utils::{convert_to_c_string, take_back_c_string, CReprOf, RawPointerConverter};
 use snips_nlu_utils::token::Token;
 
 #[repr(C)]
