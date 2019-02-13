@@ -1,8 +1,9 @@
 from _ctypes import pointer, byref
 from ctypes import c_char_p
 
-from snips_nlu_utils.utils import string_array_pointer, CStringArray, lib, check_ffi_error, CTokenArray, \
-    token_array_pointer, ngram_array_pointer, CNgramArray
+from snips_nlu_utils.utils import (
+    string_array_pointer, CStringArray, lib, check_ffi_error, CTokenArray,
+    token_array_pointer, ngram_array_pointer, CNgramArray)
 
 
 def tokenize(input, language):

@@ -1,6 +1,6 @@
 from _ctypes import byref, Structure, POINTER
 from contextlib import contextmanager
-from ctypes import c_char_p, cdll, string_at, c_uint32
+from ctypes import c_char_p, cdll, string_at, c_int
 from pathlib import Path
 
 PACKAGE_PATH = Path(__file__).absolute().parent
@@ -13,7 +13,7 @@ lib = cdll.LoadLibrary(str(dylib_path))
 class CStringArray(Structure):
     _fields_ = [
         ("data", POINTER(c_char_p)),
-        ("size", c_uint32)
+        ("size", c_int)
     ]
 
     def to_pylist(self):
@@ -23,10 +23,10 @@ class CStringArray(Structure):
 class CToken(Structure):
     _fields_ = [
         ("value", c_char_p),
-        ("range_start", c_uint32),
-        ("range_end", c_uint32),
-        ("char_range_start", c_uint32),
-        ("char_range_end", c_uint32),
+        ("range_start", c_int),
+        ("range_end", c_int),
+        ("char_range_start", c_int),
+        ("char_range_end", c_int),
     ]
 
     def to_pytoken(self):
@@ -46,7 +46,7 @@ class CToken(Structure):
 class CTokenArray(Structure):
     _fields_ = [
         ("data", POINTER(CToken)),
-        ("size", c_uint32)
+        ("size", c_int)
     ]
 
     def to_pylist(self):
@@ -56,8 +56,8 @@ class CTokenArray(Structure):
 class CNgram(Structure):
     _fields_ = [
         ("ngram", c_char_p),
-        ("token_indexes", POINTER(c_uint32)),
-        ("nb_token_indexes", c_uint32)
+        ("token_indexes", POINTER(c_int)),
+        ("nb_token_indexes", c_int)
     ]
 
     def to_pytoken(self):
@@ -70,7 +70,7 @@ class CNgram(Structure):
 class CNgramArray(Structure):
     _fields_ = [
         ("data", POINTER(CNgram)),
-        ("size", c_uint32)
+        ("size", c_int)
     ]
 
     def to_pylist(self):
