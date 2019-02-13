@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Install Rust
-if [ -z ${TRAVIS_RUST_VERSION+w} ]; then
+if [[ -z ${TRAVIS_RUST_VERSION+w} ]]; then
   curl https://sh.rustup.rs -sSf | bash -s -- -y
 fi
 
-if [ $TRAVIS_OS_NAME == "osx" ] && [ $PYTHON_TESTS == "true" ]; then
+if [[ ${TRAVIS_OS_NAME} == "osx" ]] && [[ ${PYTHON_TESTS} == "true" ]]; then
   # install pyenv
   git clone --depth 1 https://github.com/pyenv/pyenv ~/.pyenv
   PYENV_ROOT="$HOME/.pyenv"
