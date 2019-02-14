@@ -3,6 +3,7 @@ mod string;
 mod token;
 mod types;
 
+use crate::types::CNgramArray;
 use failure::{Fallible, ResultExt};
 use ffi_utils::*;
 use snips_nlu_utils::StringTrieMap;
@@ -142,6 +143,13 @@ pub extern "C" fn snips_nlu_utils_destroy_string_array(
 }
 
 #[no_mangle]
+pub extern "C" fn snips_nlu_utils_destroy_ngram_array(
+    ptr: *mut types::CNgramArray,
+) -> SNIPS_RESULT {
+    wrap!(destroy::destroy_ngram_array_c(ptr))
+}
+
+#[no_mangle]
 pub extern "C" fn snips_nlu_utils_destroy_token_array(
     ptr: *mut types::CTokenArray,
 ) -> SNIPS_RESULT {
@@ -188,4 +196,13 @@ pub extern "C" fn snips_nlu_utils_tokenize_light(
     result: *mut *const ::ffi_utils::CStringArray,
 ) -> SNIPS_RESULT {
     wrap!(token::tokenize_light_c(input, language, result))
+}
+
+#[no_mangle]
+pub extern "C" fn snips_nlu_utils_compute_all_ngrams(
+    tokens: *const CStringArray,
+    max_ngram_size: libc::c_uint,
+    result: *mut *const CNgramArray,
+) -> SNIPS_RESULT {
+    wrap!(token::compute_all_ngrams_c(tokens, max_ngram_size, result))
 }
