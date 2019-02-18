@@ -1,5 +1,6 @@
 use crate::trie::{Key, Trie};
 use crate::StringTrieMap;
+use rand;
 use tempfile::tempdir;
 
 trait ToVal {
@@ -101,7 +102,6 @@ fn remove() {
             "{}",
             format!("key: {:?} returned None \n {:#?}", key.to_val(), trie)
         );
-        assert!(trie.check_integrity());
     }
 
     assert!(trie.is_empty());
@@ -205,7 +205,7 @@ fn test_trie_map() {
     map.insert("gamma  rho", "sigma");
     assert_eq!(map.get("gamma  rho"), Some("sigma".to_string()));
     map.insert("gamma", "sigma  sigma");
-    assert_eq!(map.get("gamma"), Some("sigma  sigma".to_string()));
+    assert_eq!(map.get("gamma"), Some("sigma sigma".to_string()));
 
     // test dump and load
     let dir = tempdir().unwrap();
@@ -215,4 +215,25 @@ fn test_trie_map() {
     assert_eq!(map, loaded_map);
 
     dir.close().unwrap();
+}
+
+#[test]
+fn test_random_keys() {
+    let mut trie = Trie::new();
+    let mut v: Vec<Vec<i64>> = vec![];
+    for _ in 0..10000 {
+        let mut key = vec![];
+        for _ in 0..10 {
+            key.push(rand::random::<i64>());
+        }
+        v.push(key);
+    }
+
+    for k in &v {
+        trie.insert(k.clone(), k.clone());
+    }
+
+    for k in &v {
+        assert_eq!(trie.get(k.clone()), Some(&k.clone()));
+    }
 }

@@ -21,3 +21,9 @@ rmp-serde = "0.13"
 
 [dev-dependencies]
 tempfile = "3.0"
+rand = "0.6.5"
+bencher= "0.1.5"
+
+[[bench]]
+name = "trie"
+harness = false
