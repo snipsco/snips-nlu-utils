@@ -48,7 +48,7 @@ impl StringTrieMap {
                         return None;
                     }
                 }
-                Some(res.join("  "))
+                Some(res.join(" "))
             })
         })
     }
@@ -116,6 +116,25 @@ impl StringTrieMap {
         self.len() == 0
     }
 
+    /// clear the map
+    pub fn clear(&mut self) {
+        self.trie.clear();
+        self.table.clear();
+    }
+
+    /// map debug format string
+    pub fn repr(&self) -> String {
+        let mut kvs = vec![];
+        for (k, v) in self.trie.key_values() {
+            if let Some(key) = self.trie_val_to_string(k) {
+                if let Some(val) =self.trie_val_to_string(v) {
+                    kvs.push((key,val));
+                }
+            }
+        }
+        format!("{:#?}", kvs)
+    }
+
     fn trie_val_to_string(&self, val: Vec<i64>) -> Option<String> {
         let mut res = vec![];
         for frag in val {
@@ -125,7 +144,7 @@ impl StringTrieMap {
                 return None;
             }
         }
-        Some(res.join("  "))
+        Some(res.join(" "))
     }
 
     fn string_to_symbols<S: Into<String>>(&self, s: S) -> Option<Vec<i64>> {
