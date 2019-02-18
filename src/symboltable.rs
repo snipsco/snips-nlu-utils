@@ -41,6 +41,11 @@ impl SymbolTable {
         self.table.get(&key)
     }
 
+    /// clear symbol table
+    pub fn clear(&mut self) {
+        self.table.clear()
+    }
+
     /// get key matching given symbol
     pub fn get_key<S: Into<String>>(&self, symbol: S) -> Option<i64> {
         let symbol = symbol.into();
