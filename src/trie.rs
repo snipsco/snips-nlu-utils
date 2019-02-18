@@ -44,6 +44,7 @@ struct Node {
     val: Option<V>,
     children: [Option<Box<Node>>; BRANCH_FACTOR],
     child_count: i32,
+    chain: Option<Box<Node>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -56,7 +57,7 @@ pub struct Trie {
 impl Key {
     /// create new key
     pub fn new(data: V) -> Key {
-        Key{data}
+        Key { data }
     }
     /// get the internal bucket to which this key belongs, usually
     /// and index between 0 and 15
@@ -101,7 +102,6 @@ impl Key {
                 return KeyMatch::Partial(i);
             }
         }
-
         // it's a Full match IFF both keys are of equal length
         if self.len() == other.len() {
             KeyMatch::Full
@@ -122,22 +122,35 @@ impl Key {
 }
 
 impl Node {
+    pub fn new() -> Node {
+        Node {
+            key: Key::empty(),
+            val: None,
+            children: no_kids!(),
+            child_count: 0,
+            chain: None,
+        }
+    }
+
     pub fn with_keyval(k: Key, v: Option<V>) -> Node {
         Node {
             key: k,
             val: v,
             children: no_kids!(),
             child_count: 0,
+            chain: None,
         }
     }
 
     pub fn get(&self, mut k: Key) -> Option<&V> {
         debug_assert!(!k.is_empty());
         let bkt = k.get_bucket();
-        if let Some(ref child) = self.children[bkt] {
+        if self.key == k {
+            self.val.as_ref()
+        } else if let Some(ref child) = self.children[bkt] {
             match child.key.match_key(&k) {
                 KeyMatch::Partial(idx) => {
-                    if k.len() < child.key.len() {
+                    if idx < child.key.len() {
                         return None;
                     }
                     return child.get(k.split(idx));
@@ -147,11 +160,10 @@ impl Node {
                     None => return None,
                 },
                 KeyMatch::NoMatch => {
-                    return None;
+                    // this is a bucket-collision
+                    child.chain_get(k)
                 }
             }
-        } else if self.key == k {
-            self.val.as_ref()
         } else {
             None
         }
@@ -160,13 +172,13 @@ impl Node {
     pub fn insert(&mut self, mut k: Key, v: V) -> Option<V> {
         debug_assert!(!k.is_empty());
         let bkt = k.get_bucket();
-        if let Some(ref mut child) = self.children[bkt] {
+        if self.key == k {
+            self.replace_value(v)
+        } else if let Some(ref mut child) = self.children[bkt] {
             match child.key.match_key(&k) {
                 KeyMatch::Partial(idx) => {
-                    if k.len() < child.key.len() {
-                        if child.val.is_some() {
-                            child.split(idx);
-                        }
+                    if idx < child.key.len() {
+                        child.split(idx);
                         return self.insert(k, v);
                     }
                     return child.insert(k.split(idx), v);
@@ -175,48 +187,131 @@ impl Node {
                     return child.replace_value(v);
                 }
                 KeyMatch::NoMatch => {
-                    return child.insert(k, v);
+                    // this is a bucket-collission
+                    child.chain_insert(k, v)
                 }
             }
-        } else if self.key == k {
-            self.replace_value(v)
         } else {
             self.add_child(bkt, k, v)
         }
     }
 
-    pub fn remove(&mut self, mut k: Key) -> Option<V> {
-        let bkt = k.get_bucket();
-        if let Some(ref mut child) = self.children[bkt] {
-            match child.key.match_key(&k) {
-                KeyMatch::Full => {
-                    let res = child.val.take();
-                    if child.child_count == 0 {
-                        self.children[bkt] = None;
-                        self.child_count -= 1;
-                    } else {
-                        child.prune();
-                    }
-                    //self.prune();
-                    res
-                }
+    pub fn chain_insert(&mut self, mut k: Key, v: V) -> Option<V> {
+        if let Some(ref mut chain) = self.chain {
+            match chain.key.match_key(&k) {
+                KeyMatch::Full => chain.replace_value(v),
+                KeyMatch::NoMatch => chain.chain_insert(k, v),
                 KeyMatch::Partial(idx) => {
-                    if k.len() < child.key.len() {
-                        return None;
+                    // TODO: what's going on here
+                    if idx < chain.key.len() {
+                        chain.split(idx);
+                        if idx < k.len() {
+                            chain.insert(k.split(idx), v)
+                        } else {
+                            chain.insert(k, v)
+                        }
+                    } else {
+                        chain.insert(k.split(idx), v)
                     }
-                    return child.remove(k.split(idx));
                 }
-                KeyMatch::NoMatch => return None,
             }
-        } else if self.key == k {
-            self.val.take()
+        } else {
+            self.chain = Some(Box::new(Node::with_keyval(k, Some(v))));
+            None
+        }
+    }
+
+    pub fn chain_get(&self, mut k: Key) -> Option<&V> {
+        if let Some(ref chain) = self.chain {
+            match chain.key.match_key(&k) {
+                KeyMatch::Full => chain.val.as_ref(),
+                KeyMatch::NoMatch => chain.chain_get(k),
+                KeyMatch::Partial(idx) => {
+                    if idx < chain.key.len() {
+                        None
+                    } else {
+                        chain.get(k.split(idx))
+                    }
+                }
+            }
         } else {
             None
         }
     }
 
+    pub fn chain_remove(&mut self, mut k: Key) -> Option<V> {
+        if let Some(ref mut chain) = self.chain {
+            match chain.key.match_key(&k) {
+                KeyMatch::Full => chain.val.take(),
+                KeyMatch::NoMatch => chain.chain_remove(k),
+                KeyMatch::Partial(idx) => {
+                    if idx < chain.key.len() {
+                        None
+                    } else {
+                        chain.remove(k.split(idx))
+                    }
+                }
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn remove(&mut self, mut k: Key) -> Option<V> {
+        let bkt = k.get_bucket();
+        if self.key == k {
+            self.val.take()
+        } else if let Some(ref mut child) = self.children[bkt] {
+            match child.key.match_key(&k) {
+                KeyMatch::Full => {
+                    let res = child.val.take();
+                    if child.child_count == 0 {
+                        if child.chain.is_none() {
+                            self.children[bkt] = None;
+                        } else {
+                            self.children[bkt] = child.chain.take();
+                        }
+                        self.child_count -= 1;
+                    } else {
+                        child.prune();
+                    }
+                    res
+                }
+                KeyMatch::Partial(idx) => {
+                    if idx < child.key.len() {
+                        return None;
+                    }
+                    return child.remove(k.split(idx));
+                }
+                KeyMatch::NoMatch => {
+                    // bucket-collision
+                    child.chain_remove(k)
+                }
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn key_values(&self, mut kvs: &mut Vec<(V, V)>, mut k: V) {
+        if let Some(ref chain) = self.chain {
+            chain.key_values(&mut kvs, k.clone());
+        }
+        k.append(&mut self.key.data.clone());
+        for node in self.children.iter() {
+            if let Some(child) = node {
+                child.key_values(&mut kvs, k.clone());
+            }
+        }
+
+        if let Some(ref val) = self.val {
+            kvs.push((k.clone(), val.clone()))
+        }
+    }
+
+    #[allow(unused)]
     fn prune(&mut self) {
-        if self.child_count == 1 && self.val == None {
+        if self.child_count == 1 && self.val == None && self.chain == None {
             // find the child: expensive op. optimize??
             let mut idx: usize = 0;
             for (i, val) in self.children.iter().enumerate() {
@@ -237,7 +332,6 @@ impl Node {
     }
 
     pub fn split(&mut self, idx: usize) {
-        debug_assert!(self.val.is_some());
         // split key and grab the value
         let key = self.key.split(idx);
         let val = self.val.take();
@@ -251,6 +345,7 @@ impl Node {
             val,
             children,
             child_count,
+            chain: None,
         }));
     }
 
@@ -291,12 +386,7 @@ impl Trie {
     pub fn new() -> Trie {
         Trie {
             length: 0,
-            root: Node {
-                key: Key::empty(),
-                val: None,
-                children: no_kids!(),
-                child_count: 0,
-            },
+            root: Node::new(),
         }
     }
 
@@ -345,6 +435,12 @@ impl Trie {
         self.length
     }
 
+    /// clear the trie
+    pub fn clear(&mut self) {
+        self.root = Node::new();
+        self.length = 0;
+    }
+
     /// check if the trie obeys expected invariants / validity checks
     pub fn check_integrity(&self) -> bool {
         for i in 0..BRANCH_FACTOR {
@@ -373,6 +469,14 @@ impl Trie {
         let rdr = BufReader::new(ifile);
         let trie: Trie = rmps::decode::from_read(rdr)?;
         Ok(trie)
+    }
+
+    /// get key-val pairs stored in the trie
+    /// this expensive, lotsa clones
+    pub fn key_values(&self) -> Vec<(V, V)> {
+        let mut kvs = vec![];
+        self.root.key_values(&mut kvs, vec![]);
+        kvs
     }
 }
 
