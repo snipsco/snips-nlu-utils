@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2018-02-27
+
+### Added
+- Portuguese support
+
+### Changed
+- Refactored the FFI
+
 ## [0.7.1] - 2018-01-16
 ### Added
 - Python3.7 builds
@@ -18,6 +26,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Add `get_shape` function
 
+[0.8.0]: https://github.com/snipsco/snips-nlu-utils/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/snipsco/snips-nlu-utils/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/snipsco/snips-nlu-utils/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/snipsco/snips-nlu-utils/compare/0.6.0...0.6.1
