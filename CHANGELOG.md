@@ -1,8 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.8.0] - 2018-02-27
+## [Unreleased]
 
+## [0.8.0] - 2018-02-27
 ### Added
 - Portuguese support
 
@@ -26,6 +27,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Add `get_shape` function
 
+[Unreleased]: https://github.com/snipsco/snips-nlu-utils/compare/0.8.0...HEAD
 [0.8.0]: https://github.com/snipsco/snips-nlu-utils/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/snipsco/snips-nlu-utils/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/snipsco/snips-nlu-utils/compare/0.6.1...0.7.0
