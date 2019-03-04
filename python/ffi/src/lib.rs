@@ -61,6 +61,14 @@ pub extern "C" fn snips_nlu_utils_get_shape(
 }
 
 #[no_mangle]
+pub extern "C" fn snips_nlu_utils_hash_str_to_i32(
+    input: *const ::libc::c_char,
+    result: *mut ::libc::c_int,
+) -> SNIPS_RESULT {
+    wrap!(string::hash_str_to_i32_c(input, result))
+}
+
+#[no_mangle]
 pub extern "C" fn snips_nlu_utils_tokenize(
     input: *const ::libc::c_char,
     language: *const ::libc::c_char,
