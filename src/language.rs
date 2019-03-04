@@ -8,6 +8,7 @@ const SPACE: &str = " ";
 macro_rules! language_enum {
     ([$($language:ident),*]) => {
         /// Enumerates all language supported
+        #[allow(non_camel_case_types)]
         #[derive(Copy,Clone,Debug)]
         pub enum Language {
             $( $language, )*
