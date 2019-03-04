@@ -41,5 +41,5 @@ def hash_str(string):
     )
     check_ffi_error(exit_code,
                     "Something went wrong when hashing '%s'" % string)
-    result = int(hsh)
+    result = int(hsh.value)
     return result
