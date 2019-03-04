@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 import unittest
 
-from snips_nlu_utils import remove_diacritics, get_shape, normalize, tokenize_light, tokenize
+from snips_nlu_utils import get_shape, hash_str, normalize, remove_diacritics, \
+    tokenize, tokenize_light
 from snips_nlu_utils.token import compute_all_ngrams
 
 
@@ -104,3 +105,7 @@ class TestNluUtils(unittest.TestCase):
         self.assertEqual("XXX", get_shape("HELLO"))
         self.assertEqual("Xxx", get_shape("Hello"))
         self.assertEqual("xX", get_shape("hEllo"))
+
+    def test_should_hash_str(self):
+        self.assertEqual(-2136294133, hash_str("hello"))
+        self.assertEqual(1930201843, hash_str("world"))
