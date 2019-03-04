@@ -1,15 +1,9 @@
 import io
 import os
+import sys
 
 from setuptools import setup, find_packages
-from setuptools_rust import RustExtension
-
-try:
-    from setuptools_rust import Binding
-
-    rust_kwargs = {'binding': Binding.RustCPython}
-except ImportError:
-    rust_kwargs = dict()
+from setuptools_rust import Binding, RustExtension
 
 packages = [p for p in find_packages() if "tests" not in p]
 
@@ -17,11 +11,14 @@ PACKAGE_NAME = "snips_nlu_utils"
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 PACKAGE_PATH = os.path.join(ROOT_PATH, PACKAGE_NAME)
 README = os.path.join(ROOT_PATH, "README.rst")
-
-CARGO_FILE_PATH = os.path.join(ROOT_PATH, 'snips_nlu_utils_py', 'Cargo.toml')
-RUST_EXTENSION_NAME = 'snips_nlu_utils._snips_nlu_utils_py'
-
 VERSION = "__version__"
+
+RUST_EXTENSION_NAME = 'snips_nlu_utils.dylib.libsnips_nlu_utils_rs'
+CARGO_ROOT_PATH = os.path.join(ROOT_PATH, 'ffi')
+CARGO_FILE_PATH = os.path.join(CARGO_ROOT_PATH, 'Cargo.toml')
+CARGO_TARGET_DIR = os.path.join(CARGO_ROOT_PATH, 'target')
+os.environ['CARGO_TARGET_DIR'] = CARGO_TARGET_DIR
+
 with io.open(os.path.join(PACKAGE_PATH, VERSION)) as f:
     version = f.readline().strip()
 
@@ -29,11 +26,17 @@ with io.open(README, 'rt', encoding='utf8') as f:
     readme = f.read()
 
 required = [
-    "future==0.16.0"
+    "future==0.16.0",
+    "pathlib==1.0.1; python_version < '3.4'",
 ]
 
+rust_extension = RustExtension(
+    RUST_EXTENSION_NAME, CARGO_FILE_PATH, debug="develop" in sys.argv,
+    args=["--verbose"] if "--verbose" in sys.argv else None,
+    binding=Binding.NoBinding)
+
 setup(name=PACKAGE_NAME,
-      description="NLU utils library for Snips NLU",
+      description="Python wrapper of the snips-nlu-utils Rust crate",
       long_description=readme,
       version=version,
       author="Adrien Ball",
@@ -49,9 +52,7 @@ setup(name=PACKAGE_NAME,
           "Programming Language :: Python :: 3.7",
       ],
       install_requires=required,
-      rust_extensions=[RustExtension(RUST_EXTENSION_NAME, CARGO_FILE_PATH,
-                                     **rust_kwargs)],
+      rust_extensions=[rust_extension],
       packages=packages,
       include_package_data=True,
-      # rust extensions are not zip safe, just like C-extensions.
       zip_safe=False)

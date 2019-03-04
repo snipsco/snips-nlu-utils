@@ -9,7 +9,7 @@ use crate::language::Language;
 use crate::range::ranges_overlap;
 use crate::string::{convert_to_char_range, normalize};
 
-pub type Ngrams = (String, Vec<usize>);
+pub type Ngram = (String, Vec<usize>);
 
 const CURRENCIES: &str = "$؋ƒ៛¥₡₱£€¢﷼₪₩₭₨₮₦₽฿₴₫";
 
@@ -79,12 +79,12 @@ fn _regex_tokenization(input: &str, regexes: &[&Regex]) -> Vec<Token> {
     non_overlapping_tokens
 }
 
-pub fn compute_all_ngrams(tokens: &[&str], max_ngram_size: usize) -> Vec<Ngrams> {
-    let mut ngrams: Vec<Ngrams> = Vec::new();
+pub fn compute_all_ngrams(tokens: &[&str], max_ngram_size: usize) -> Vec<Ngram> {
+    let mut ngrams: Vec<Ngram> = Vec::new();
 
     for start in 0..tokens.len() {
-        let mut local_ngrams: Vec<Ngrams> = Vec::new();
-        let mut last_ngram_item: Option<Ngrams> = None;
+        let mut local_ngrams: Vec<Ngram> = Vec::new();
+        let mut last_ngram_item: Option<Ngram> = None;
         let max_end = min(tokens.len(), start + max_ngram_size);
 
         for end in start..max_end {
@@ -181,12 +181,12 @@ mod tests {
     #[test]
     fn compute_all_ngrams_works() {
         let result = compute_all_ngrams(&vec!["a", "b", "c"], 3);
-        let expected: Vec<Ngrams> = vec![("a".to_string(), vec![0]),
-                                         ("a b".to_string(), vec![0, 1]),
-                                         ("a b c".to_string(), vec![0, 1, 2]),
-                                         ("b".to_string(), vec![1]),
-                                         ("b c".to_string(), vec![1, 2]),
-                                         ("c".to_string(), vec![2])];
+        let expected: Vec<Ngram> = vec![("a".to_string(), vec![0]),
+                                        ("a b".to_string(), vec![0, 1]),
+                                        ("a b c".to_string(), vec![0, 1, 2]),
+                                        ("b".to_string(), vec![1]),
+                                        ("b c".to_string(), vec![1, 2]),
+                                        ("c".to_string(), vec![2])];
         assert_eq!(result, expected)
     }
 

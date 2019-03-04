@@ -2,55 +2,75 @@
 from __future__ import unicode_literals
 
 import unittest
-from builtins import str, bytes
 
-from snips_nlu_utils import (
-    compute_all_ngrams, get_shape, normalize, remove_diacritics, tokenize,
-    tokenize_light)
+from snips_nlu_utils import remove_diacritics, get_shape, normalize, tokenize_light, tokenize
+from snips_nlu_utils.token import compute_all_ngrams
 
 
-class TestNLUUtils(unittest.TestCase):
+class TestNluUtils(unittest.TestCase):
     def test_should_tokenize(self):
         # Given
-        u = "let's eat food tonight"
+        u = "foo bär baz"
         language = "en"
 
         # When
         tokens = tokenize(u, language)
 
         # Then
-        self.assertGreater(len(tokens), 0)
-        self.assertTrue(all(isinstance(t, dict) for t in tokens))
+        expected_tokens = [
+            {
+                "value": "foo",
+                "range": {
+                    "start": 0,
+                    "end": 3
+                },
+                "char_range": {
+                    "start": 0,
+                    "end": 3
+                }
+            },
+            {
+                "value": "bär",
+                "range": {
+                    "start": 4,
+                    "end": 8
+                },
+                "char_range": {
+                    "start": 4,
+                    "end": 7
+                }
+            },
+            {
+                "value": "baz",
+                "range": {
+                    "start": 9,
+                    "end": 12
+                },
+                "char_range": {
+                    "start": 8,
+                    "end": 11
+                }
+            },
+        ]
+        self.assertListEqual(expected_tokens, tokens)
+
+    def test_should_tokenize_empty_string(self):
+        self.assertListEqual([], tokenize("", "en"))
 
     def test_should_tokenize_light(self):
         # Given
-        u = "let's eat food tonight"
+        u = "foo' bär baz"
         language = "en"
 
         # When
         tokens = tokenize_light(u, language)
 
         # Then
-        self.assertGreater(len(tokens), 0)
-        self.assertTrue(all(isinstance(t, str) for t in tokens))
+        expected_tokens = ["foo", "bär", "baz"]
+        self.assertListEqual(expected_tokens, tokens)
 
-    def test_tokenize_should_raise_on_string(self):
-        # Given
-        s = bytes(b"let's eat food tonight")
-        language = bytes(b"en")
-
-        # When / Then
-        with self.assertRaises(TypeError):
-            tokenize(s, language)
-
-    def test_tokenize_light_should_raise_on_string(self):
-        # Given
-        s = bytes(b"let's eat food tonight")
-        language = bytes(b"en")
-
-        # When / Then
-        with self.assertRaises(TypeError):
-            tokenize_light(s, language)
+    def test_should_tokenize_light_empty_string(self):
+        self.assertListEqual([], tokenize_light("", "en"))
 
     def test_should_remove_diacritics(self):
         self.assertEqual("Hello", remove_diacritics("Hëllo"))
