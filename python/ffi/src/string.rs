@@ -29,3 +29,10 @@ pub fn get_shape_c(input: *const ::libc::c_char, result: *mut *const ::libc::c_c
     unsafe { *result = cs };
     Ok(())
 }
+
+pub fn hash_str_to_i32_c(input: *const ::libc::c_char, result: *mut ::libc::c_int) -> Result<()> {
+    let str_input = unsafe { CStr::from_ptr(input) }.to_str()?;
+    let hash = hash_str_to_i32(str_input);
+    unsafe { *result = hash };
+    Ok(())
+}

@@ -1,6 +1,6 @@
 [package]
 name = "snips-nlu-utils"
-version = "0.8.0-SNAPSHOT"
+version = "0.9.0-SNAPSHOT"
 authors = ["Adrien Ball <adrien.ball@snips.ai>"]
 edition = "2018"
 
@@ -16,3 +16,4 @@ libc = "0.2"
 regex = "1.1"
 unicode-normalization = "0.1.5"
 failure = "0.1"
+fnv = "1.0"

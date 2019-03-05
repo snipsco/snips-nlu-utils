@@ -1,5 +1,9 @@
+use fnv::FnvHasher;
+use std::hash::Hasher;
 use std::ops::Range;
-use unicode_normalization::char::{decompose_canonical, compose, is_combining_mark};
+use unicode_normalization::char::{compose, decompose_canonical, is_combining_mark};
+
+const FNV_DEFAULT_KEY: u64 = 0xcbf2_9ce4_8422_2325;
 
 pub fn convert_to_char_range(string: &str, range: &Range<usize>) -> Range<usize> {
     Range {
@@ -68,7 +72,7 @@ pub fn suffix_from_char_index(string: String, index: usize) -> String {
 ///
 /// ```
 /// use snips_nlu_utils::string::normalize;
-/// 
+///
 /// assert_eq!("heloa".to_string(), normalize("  HelöÀ "));
 /// ```
 pub fn normalize(string: &str) -> String {
@@ -87,7 +91,10 @@ pub fn normalize(string: &str) -> String {
 /// assert_eq!("ceaA".to_owned(), remove_diacritics("çéaÀ"));
 /// ```
 pub fn remove_diacritics(string: &str) -> String {
-    string.chars().flat_map(|c| remove_combination_marks(c)).collect()
+    string
+        .chars()
+        .flat_map(|c| remove_combination_marks(c))
+        .collect()
 }
 
 fn remove_combination_marks(character: char) -> Option<char> {
@@ -98,11 +105,13 @@ fn remove_combination_marks(character: char) -> Option<char> {
         }
     });
     let first_char = decomposition.first().map(|c| c.to_owned());
-    decomposition.into_iter().skip(1).fold(first_char, |opt_acc, c| {
-        opt_acc.map(|acc| compose(acc, c)).unwrap_or(None)
-    })
+    decomposition
+        .into_iter()
+        .skip(1)
+        .fold(first_char, |opt_acc, c| {
+            opt_acc.map(|acc| compose(acc, c)).unwrap_or(None)
+        })
 }
-
 
 /// Get the shape of the string in one of the following format:
 ///
@@ -143,6 +152,14 @@ fn is_title_case(string: &str) -> bool {
         }
     }
     !first
+}
+
+/// utility function for hashing str to i32 values
+pub fn hash_str_to_i32(input: &str) -> i32 {
+    let mut hasher = FnvHasher::with_key(FNV_DEFAULT_KEY);
+    hasher.write(input.as_bytes());
+
+    hasher.finish() as i32
 }
 
 #[cfg(test)]

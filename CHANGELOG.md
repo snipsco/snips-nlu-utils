@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+- Add `hash_str_to_i32` function
+
 ## [0.8.0] - 2018-02-27
 
 ### Added
