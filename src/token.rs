@@ -39,7 +39,7 @@ impl Token {
 pub fn tokenize(input: &str, language: Language) -> Vec<Token> {
     lazy_static! {
         static ref WORD_REGEX: Regex = RegexBuilder::new(r"\w+").unicode(true).build().unwrap();
-        static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]+", CURRENCIES)).unicode(true).build().unwrap();
+        static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]", CURRENCIES)).unicode(true).build().unwrap();
     }
     match language {
         _ => _regex_tokenization(input, &[&WORD_REGEX, &SYMBOL_REGEX])
@@ -157,9 +157,15 @@ mod tests {
         let retrieved = tokenize(text, language);
         let expected = vec![
             Token {
-                value: "$$".to_string(),
-                range: 0..2,
-                char_range: 0..2,
+                value: "$".to_string(),
+                range: 0..1,
+                char_range: 0..1,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 1..2,
+                char_range: 1..2,
                 _normalized: None,
             },
             Token {
@@ -169,9 +175,61 @@ mod tests {
                 _normalized: None,
             },
             Token {
-                value: "!!".to_string(),
-                range: 5..7,
-                char_range: 5..7,
+                value: "!".to_string(),
+                range: 5..6,
+                char_range: 5..6,
+                _normalized: None,
+            },
+            Token {
+                value: "!".to_string(),
+                range: 6..7,
+                char_range: 6..7,
+                _normalized: None,
+            },
+        ];
+        assert_eq!(retrieved, expected);
+    }
+
+    #[test]
+    fn tokenize_words_and_symbols_works() {
+        let text = "hello$$ %world?";
+        let language = Language::EN;
+        let retrieved = tokenize(text, language);
+        let expected = vec![
+            Token {
+                value: "hello".to_string(),
+                range: 0..5,
+                char_range: 0..5,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 5..6,
+                char_range: 5..6,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 6..7,
+                char_range: 6..7,
+                _normalized: None,
+            },
+            Token {
+                value: "%".to_string(),
+                range: 8..9,
+                char_range: 8..9,
+                _normalized: None,
+            },
+            Token {
+                value: "world".to_string(),
+                range: 9..14,
+                char_range: 9..14,
+                _normalized: None,
+            },
+            Token {
+                value: "?".to_string(),
+                range: 14..15,
+                char_range: 14..15,
                 _normalized: None,
             },
         ];
