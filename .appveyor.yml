@@ -19,7 +19,7 @@ install:
   - if defined MSYS2_BITS set PATH=%PATH%;C:\msys64\mingw%MSYS2_BITS%\bin
   - rustc -V
   - cargo -V
-  - ps: (Get-Content python/snips_nlu_utils_py/Cargo.toml) | ForEach-Object { $_ -replace "^snips-nlu-utils = .*$", "snips-nlu-utils = { path = `"../..`" }" } | Set-Content python/snips_nlu_utils_py/Cargo.toml
+  - ps: (Get-Content python/ffi/Cargo.toml) | ForEach-Object { $_ -replace "^snips-nlu-utils = .*$", "snips-nlu-utils = { path = `"../..`" }" } | Set-Content python/ffi/Cargo.toml
   - "%PYTHON%\\python.exe -m pip install -r python/requirements.txt"
 
 build: false

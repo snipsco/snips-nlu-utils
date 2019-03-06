@@ -1,6 +1,6 @@
 include snips_nlu_utils/__version__
 include README.rst requirements.txt
 recursive-include snips_nlu_utils *.so
-include snips_nlu_utils_py/Cargo.toml
-recursive-include snips_nlu_utils_py/src *.rs
+include ffi/Cargo.toml
+recursive-include ffi/src *.rs
 global-exclude __pycache__ *.py[cod]

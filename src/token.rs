@@ -9,7 +9,7 @@ use crate::language::Language;
 use crate::range::ranges_overlap;
 use crate::string::{convert_to_char_range, normalize};
 
-pub type Ngrams = (String, Vec<usize>);
+pub type Ngram = (String, Vec<usize>);
 
 const CURRENCIES: &str = "$؋ƒ៛¥₡₱£€¢﷼₪₩₭₨₮₦₽฿₴₫";
 
@@ -39,7 +39,7 @@ impl Token {
 pub fn tokenize(input: &str, language: Language) -> Vec<Token> {
     lazy_static! {
         static ref WORD_REGEX: Regex = RegexBuilder::new(r"\w+").unicode(true).build().unwrap();
-        static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]+", CURRENCIES)).unicode(true).build().unwrap();
+        static ref SYMBOL_REGEX: Regex = RegexBuilder::new(&format!("[?!&%{}]", CURRENCIES)).unicode(true).build().unwrap();
     }
     match language {
         _ => _regex_tokenization(input, &[&WORD_REGEX, &SYMBOL_REGEX])
@@ -79,12 +79,12 @@ fn _regex_tokenization(input: &str, regexes: &[&Regex]) -> Vec<Token> {
     non_overlapping_tokens
 }
 
-pub fn compute_all_ngrams(tokens: &[&str], max_ngram_size: usize) -> Vec<Ngrams> {
-    let mut ngrams: Vec<Ngrams> = Vec::new();
+pub fn compute_all_ngrams(tokens: &[&str], max_ngram_size: usize) -> Vec<Ngram> {
+    let mut ngrams: Vec<Ngram> = Vec::new();
 
     for start in 0..tokens.len() {
-        let mut local_ngrams: Vec<Ngrams> = Vec::new();
-        let mut last_ngram_item: Option<Ngrams> = None;
+        let mut local_ngrams: Vec<Ngram> = Vec::new();
+        let mut last_ngram_item: Option<Ngram> = None;
         let max_end = min(tokens.len(), start + max_ngram_size);
 
         for end in start..max_end {
@@ -157,9 +157,15 @@ mod tests {
         let retrieved = tokenize(text, language);
         let expected = vec![
             Token {
-                value: "$$".to_string(),
-                range: 0..2,
-                char_range: 0..2,
+                value: "$".to_string(),
+                range: 0..1,
+                char_range: 0..1,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 1..2,
+                char_range: 1..2,
                 _normalized: None,
             },
             Token {
@@ -169,9 +175,61 @@ mod tests {
                 _normalized: None,
             },
             Token {
-                value: "!!".to_string(),
-                range: 5..7,
-                char_range: 5..7,
+                value: "!".to_string(),
+                range: 5..6,
+                char_range: 5..6,
+                _normalized: None,
+            },
+            Token {
+                value: "!".to_string(),
+                range: 6..7,
+                char_range: 6..7,
+                _normalized: None,
+            },
+        ];
+        assert_eq!(retrieved, expected);
+    }
+
+    #[test]
+    fn tokenize_words_and_symbols_works() {
+        let text = "hello$$ %world?";
+        let language = Language::EN;
+        let retrieved = tokenize(text, language);
+        let expected = vec![
+            Token {
+                value: "hello".to_string(),
+                range: 0..5,
+                char_range: 0..5,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 5..6,
+                char_range: 5..6,
+                _normalized: None,
+            },
+            Token {
+                value: "$".to_string(),
+                range: 6..7,
+                char_range: 6..7,
+                _normalized: None,
+            },
+            Token {
+                value: "%".to_string(),
+                range: 8..9,
+                char_range: 8..9,
+                _normalized: None,
+            },
+            Token {
+                value: "world".to_string(),
+                range: 9..14,
+                char_range: 9..14,
+                _normalized: None,
+            },
+            Token {
+                value: "?".to_string(),
+                range: 14..15,
+                char_range: 14..15,
                 _normalized: None,
             },
         ];
@@ -181,12 +239,12 @@ mod tests {
     #[test]
     fn compute_all_ngrams_works() {
         let result = compute_all_ngrams(&vec!["a", "b", "c"], 3);
-        let expected: Vec<Ngrams> = vec![("a".to_string(), vec![0]),
-                                         ("a b".to_string(), vec![0, 1]),
-                                         ("a b c".to_string(), vec![0, 1, 2]),
-                                         ("b".to_string(), vec![1]),
-                                         ("b c".to_string(), vec![1, 2]),
-                                         ("c".to_string(), vec![2])];
+        let expected: Vec<Ngram> = vec![("a".to_string(), vec![0]),
+                                        ("a b".to_string(), vec![0, 1]),
+                                        ("a b c".to_string(), vec![0, 1, 2]),
+                                        ("b".to_string(), vec![1]),
+                                        ("b c".to_string(), vec![1, 2]),
+                                        ("c".to_string(), vec![2])];
         assert_eq!(result, expected)
     }
 

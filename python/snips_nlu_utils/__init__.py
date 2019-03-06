@@ -1,3 +1,3 @@
-from ._snips_nlu_utils_py import (
-    get_shape, tokenize, tokenize_light, compute_all_ngrams,normalize,
-    remove_diacritics)
+from snips_nlu_utils.string import get_shape, hash_str, normalize, \
+    remove_diacritics
+from snips_nlu_utils.token import compute_all_ngrams, tokenize, tokenize_light
