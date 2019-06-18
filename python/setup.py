@@ -28,10 +28,6 @@ with io.open(os.path.join(PACKAGE_PATH, VERSION)) as f:
 with io.open(README, 'rt', encoding='utf8') as f:
     readme = f.read()
 
-required = [
-    "future==0.16.0"
-]
-
 setup(name=PACKAGE_NAME,
       description="NLU utils library for Snips NLU",
       long_description=readme,
@@ -48,7 +44,8 @@ setup(name=PACKAGE_NAME,
           "Programming Language :: Python :: 3.6",
           "Programming Language :: Python :: 3.7",
       ],
-      install_requires=required,
+      install_requires=[],
+      extras_require = {"test": ["future>=0.16,<0.18"]},
       rust_extensions=[RustExtension(RUST_EXTENSION_NAME, CARGO_FILE_PATH,
                                      **rust_kwargs)],
       packages=packages,

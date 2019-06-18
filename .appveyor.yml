@@ -11,6 +11,7 @@ branches:
   only:
     - master
     - develop
+    - /lts-.*/
 
 install:
   - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
@@ -27,7 +28,7 @@ build: false
 test_script:
   - cargo test --verbose
   - cd python
-  - "%PYTHON%\\python.exe -m pip install -e . --verbose"
+  - "%PYTHON%\\python.exe -m pip install -e .[test] --verbose"
   - "%PYTHON%\\python.exe -m unittest discover"
 
 after_test:
@@ -43,6 +44,7 @@ for:
   branches:
     only:
       - master
+      - /lts-.*/
 
   environment:
     matrix:
