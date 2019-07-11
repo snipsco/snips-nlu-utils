@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 
 import unittest
 
-from snips_nlu_utils import get_shape, hash_str, normalize, remove_diacritics, \
-    tokenize, tokenize_light
+from snips_nlu_utils import (
+    get_shape, hash_str, normalize, remove_diacritics, tokenize,
+    tokenize_light)
 from snips_nlu_utils.token import compute_all_ngrams
 
 

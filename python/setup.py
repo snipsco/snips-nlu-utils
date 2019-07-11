@@ -25,15 +25,14 @@ with io.open(os.path.join(PACKAGE_PATH, VERSION)) as f:
 with io.open(README, 'rt', encoding='utf8') as f:
     readme = f.read()
 
-required = [
-    "future==0.16.0",
-    "pathlib==1.0.1; python_version < '3.4'",
-]
-
 rust_extension = RustExtension(
     RUST_EXTENSION_NAME, CARGO_FILE_PATH, debug="develop" in sys.argv,
     args=["--verbose"] if "--verbose" in sys.argv else None,
     binding=Binding.NoBinding)
+
+install_requires = [
+    "pathlib>=1.0,<2.0; python_version<'3.4'"
+]
 
 setup(name=PACKAGE_NAME,
       description="Python wrapper of the snips-nlu-utils Rust crate",
@@ -51,7 +50,8 @@ setup(name=PACKAGE_NAME,
           "Programming Language :: Python :: 3.6",
           "Programming Language :: Python :: 3.7",
       ],
-      install_requires=required,
+      install_requires=install_requires,
+      extras_require={"test": ["future>=0.16,<0.18"]},
       rust_extensions=[rust_extension],
       packages=packages,
       include_package_data=True,
