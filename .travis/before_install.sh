@@ -13,10 +13,6 @@ if [[ ${TRAVIS_OS_NAME} == "osx" ]] && [[ ${PYTHON_TESTS} == "true" ]]; then
   eval "$(pyenv init -)"
 
   case "${TOXENV}" in
-    "py27")
-      pyenv install 2.7.14
-      pyenv global 2.7.14
-      ;;
     "py36")
       pyenv install 3.6.1
       pyenv global 3.6.1
@@ -24,6 +20,10 @@ if [[ ${TRAVIS_OS_NAME} == "osx" ]] && [[ ${PYTHON_TESTS} == "true" ]]; then
     "py37")
       pyenv install 3.7.2
       pyenv global 3.7.2
+      ;;
+    "py38")
+      pyenv install 3.8.1
+      pyenv global 3.8.1
       ;;
   esac
   pyenv rehash

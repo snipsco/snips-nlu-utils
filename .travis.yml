@@ -4,12 +4,6 @@ matrix:
       osx_image: xcode8
       language: generic
       env:
-        - TOXENV=py27
-        - PYTHON_TESTS=true
-    - os: osx
-      osx_image: xcode8
-      language: generic
-      env:
         - TOXENV=py36
         - PYTHON_TESTS=true
     - os: osx
@@ -18,12 +12,12 @@ matrix:
       env:
       - TOXENV=py37
       - PYTHON_TESTS=true
-    - os: linux
-      language: python
-      python: 2.7
+    - os: osx
+      osx_image: xcode8
+      language: generic
       env:
-        - TOXENV=py27
-        - PYTHON_TESTS=true
+      - TOXENV=py38
+      - PYTHON_TESTS=true
     - os: linux
       language: python
       python: 3.6
@@ -33,6 +27,15 @@ matrix:
     - os: linux
       language: python
       python: 3.7
+      # cf https://github.com/travis-ci/travis-ci/issues/9815
+      dist: xenial
+      sudo: true
+      env:
+      - TOXENV=py37
+      - PYTHON_TESTS=true
+    - os: linux
+      language: python
+      python: 3.8
       # cf https://github.com/travis-ci/travis-ci/issues/9815
       dist: xenial
       sudo: true
